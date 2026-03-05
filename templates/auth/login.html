@@ -14,7 +14,9 @@
           <input type="password" id="password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700">
         </div>
         <p id="auth-error" class="text-red-500 text-sm hidden"></p>
+        <p id="magic-link-sent" class="text-green-600 text-sm hidden">Check your email for a sign-in link.</p>
         <button type="button" id="btn-login" class="w-full py-2 px-4 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Log in</button>
+        <button type="button" id="btn-magic" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Send magic link</button>
         <button type="button" id="btn-google" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Continue with Google</button>
       </div>
     </div>
@@ -24,60 +26,73 @@
     <a href="{% url 'landing' %}" class="mt-4 inline-block text-slate-500 hover:underline text-sm">Back to home</a>
   </div>
 </div>
-<script type="module">
+<form id="auth-form" style="display:none">{% csrf_token %}</form>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+(function() {
   const firebaseConfig = {
     apiKey: "{{ firebase_api_key }}",
     authDomain: "{{ firebase_auth_domain }}",
     projectId: "{{ firebase_project_id }}",
     storageBucket: "{{ firebase_storage_bucket }}",
   };
-  const script = document.createElement('script');
-  script.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
-  script.async = true;
-  document.head.appendChild(script);
-  script.onload = () => {
-    const authScript = document.createElement('script');
-    authScript.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js';
-    authScript.async = true;
-    document.head.appendChild(authScript);
-    authScript.onload = () => {
-      const firebase = window.firebase;
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const errEl = document.getElementById('auth-error');
-      const showErr = (msg) => { errEl.textContent = msg; errEl.classList.remove('hidden'); };
-      const hideErr = () => { errEl.textContent = ''; errEl.classList.add('hidden'); };
-      document.getElementById('btn-login').onclick = async () => {
-        hideErr();
-        try {
-          const cred = await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value);
-          const token = await cred.user.getIdToken();
-          const form = new FormData();
-          form.append('id_token', token);
-          form.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
-          const r = await fetch('{% url "firebase_login" %}', { method: 'POST', body: form, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-          const data = await r.json();
-          if (data.ok) window.location = data.redirect;
-          else showErr(data.error || 'Login failed');
-        } catch (e) { showErr(e.message || 'Login failed'); }
-      };
-      document.getElementById('btn-google').onclick = async () => {
-        hideErr();
-        try {
-          const provider = new firebase.auth.GoogleAuthProvider();
-          const cred = await auth.signInWithPopup(provider);
-          const token = await cred.user.getIdToken();
-          const form = new FormData();
-          form.append('id_token', token);
-          form.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
-          const r = await fetch('{% url "firebase_login" %}', { method: 'POST', body: form, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-          const data = await r.json();
-          if (data.ok) window.location = data.redirect;
-          else showErr(data.error || 'Login failed');
-        } catch (e) { showErr(e.message || 'Login failed'); }
-      };
-    };
+  const finishSignInUrl = "{{ firebase_finish_sign_in_url|escapejs }}";
+  const loginUrl = "{% url 'firebase_login' %}";
+  const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+  const csrfToken = csrfInput ? csrfInput.value : '';
+  if (!firebaseConfig.apiKey) {
+    document.getElementById('auth-error').textContent = 'Firebase not configured. Add FIREBASE_API_KEY to .env';
+    document.getElementById('auth-error').classList.remove('hidden');
+    return;
+  }
+  let app;
+  try {
+    app = firebase.app();
+  } catch (e) {
+    app = firebase.initializeApp(firebaseConfig);
+  }
+  const auth = firebase.auth();
+  const errEl = document.getElementById('auth-error');
+  const showErr = (msg) => { errEl.textContent = msg; errEl.classList.remove('hidden'); };
+  const hideErr = () => { errEl.textContent = ''; errEl.classList.add('hidden'); };
+  const doLogin = async (token) => {
+    const form = new FormData();
+    form.append('id_token', token);
+    form.append('csrfmiddlewaretoken', csrfToken);
+    const r = await fetch(loginUrl, { method: 'POST', body: form, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    const data = await r.json();
+    if (data.ok) window.location = data.redirect;
+    else showErr(data.error || 'Login failed');
   };
+  document.getElementById('btn-login').onclick = async () => {
+    hideErr();
+    try {
+      const cred = await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value);
+      const token = await cred.user.getIdToken();
+      await doLogin(token);
+    } catch (e) { showErr(e.message || 'Login failed'); }
+  };
+  document.getElementById('btn-magic').onclick = async () => {
+    hideErr();
+    const email = document.getElementById('email').value.trim();
+    if (!email) { showErr('Enter your email address'); return; }
+    try {
+      const actionCodeSettings = { url: finishSignInUrl, handleCodeInApp: true };
+      await auth.sendSignInLinkToEmail(email, actionCodeSettings);
+      window.localStorage.setItem('emailForSignIn', email);
+      document.getElementById('magic-link-sent').classList.remove('hidden');
+    } catch (e) { showErr(e.message || 'Failed to send link'); }
+  };
+  document.getElementById('btn-google').onclick = async () => {
+    hideErr();
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const cred = await auth.signInWithPopup(provider);
+      const token = await cred.user.getIdToken();
+      await doLogin(token);
+    } catch (e) { showErr(e.message || 'Login failed'); }
+  };
+})();
 </script>
-{% csrf_token %}
 {% endblock %}

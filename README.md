@@ -20,10 +20,25 @@ pip install -r requirements.txt
 npm install
 ```
 
-2. Copy `.env.example` to `.env` and fill in your keys:
+2. **Environment variables** — choose one:
 
-- Firebase: Create a project at [Firebase Console](https://console.firebase.google.com). Add Web API key, Auth domain, Storage bucket. For server-side token verification, add a service account (download JSON or set env vars).
-- Stripe: Get API keys from [Stripe Dashboard](https://dashboard.stripe.com). Create products/prices for Basic, Standard, Pro tiers and set `stripe_price_id` on Plan records.
+**Option A: Doppler (recommended — syncs across machines)**
+
+1. Sign up at [doppler.com](https://doppler.com) (free)
+2. Create a project, add a `dev` config
+3. Add all vars from `.env.example` in the Doppler dashboard
+4. Install CLI: `winget install Doppler.Doppler` (Windows) or see [doppler.com/docs](https://docs.doppler.com/docs/install-cli)
+5. From project root: `doppler login` then `doppler setup` (select your project)
+6. Run: `doppler run -- python manage.py runserver` or `.\run.ps1`
+
+On another computer: clone, `doppler login`, `doppler setup`, then `.\run.ps1`. No need to copy `.env`.
+
+**Option B: Local .env file**
+
+Copy `.env.example` to `.env` and fill in your keys. `.env` is gitignored.
+
+- Firebase: [Firebase Console](https://console.firebase.google.com) — Web API key, Auth domain, Storage bucket, service account
+- Stripe: [Stripe Dashboard](https://dashboard.stripe.com) — API keys, create products/prices for tiers
 
 3. Run migrations:
 

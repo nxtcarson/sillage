@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+  <div class="w-full max-w-md p-8 bg-white dark:bg-slate-800 rounded-xl shadow-lg text-center">
+    <div id="status">Completing sign-in…</div>
+    <p id="auth-error" class="text-red-500 text-sm mt-4 hidden"></p>
+    <a href="{% url 'login' %}" id="back-link" class="mt-4 inline-block text-brand-600 hover:underline text-sm hidden">Back to log in</a>
+  </div>
+</div>
+<form id="auth-form" style="display:none">{% csrf_token %}</form>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+(async function() {
+  const firebaseConfig = {
+    apiKey: "{{ firebase_api_key }}",
+    authDomain: "{{ firebase_auth_domain }}",
+    projectId: "{{ firebase_project_id }}",
+    storageBucket: "{{ firebase_storage_bucket }}",
+  };
+  const firebase = window.firebase;
+  try { firebase.app(); } catch (e) { firebase.initializeApp(firebaseConfig); }
+  const auth = firebase.auth();
+  const statusEl = document.getElementById('status');
+  const errEl = document.getElementById('auth-error');
+  const backLink = document.getElementById('back-link');
+  const showErr = (msg) => { errEl.textContent = msg; errEl.classList.remove('hidden'); backLink.classList.remove('hidden'); statusEl.textContent = ''; };
+  const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+  const csrfToken = csrfInput ? csrfInput.value : '';
+  if (!auth.isSignInWithEmailLink(window.location.href)) {
+    showErr('Invalid or expired sign-in link.');
+    return;
+  }
+  let email = window.localStorage.getItem('emailForSignIn');
+  if (!email) {
+    email = window.prompt('Please enter your email to complete sign-in');
+    if (!email) {
+      showErr('Email is required to complete sign-in.');
+      return;
+    }
+  }
+  try {
+    const cred = await auth.signInWithEmailLink(email, window.location.href);
+    window.localStorage.removeItem('emailForSignIn');
+    const name = window.localStorage.getItem('nameForSignIn');
+    if (name && cred.user) {
+      await cred.user.updateProfile({ displayName: name });
+      window.localStorage.removeItem('nameForSignIn');
+    }
+    const token = await cred.user.getIdToken();
+    const form = new FormData();
+    form.append('id_token', token);
+    form.append('csrfmiddlewaretoken', csrfToken);
+    const r = await fetch('{% url "firebase_login" %}', { method: 'POST', body: form, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    const data = await r.json();
+    if (data.ok) window.location = data.redirect;
+    else showErr(data.error || 'Sign-in failed');
+  } catch (e) {
+    showErr(e.message || 'Sign-in failed');
+  }
+})();
+</script>
+{% endblock %}

@@ -23,6 +23,11 @@ def signup_page(request):
     return render(request, "auth/signup.html")
 
 
+@require_http_methods(["GET"])
+def finish_sign_in_page(request):
+    return render(request, "auth/finish_sign_in.html")
+
+
 @require_POST
 def firebase_login(request):
     token = request.POST.get("id_token") or request.headers.get("Authorization", "").replace("Bearer ", "")
