@@ -1,0 +1,4 @@
+<div class="p-3 bg-white dark:bg-slate-700 rounded-lg shadow-sm">
+  <a href="{% url 'contact_detail' lead.contact.pk %}" class="font-medium">{{ lead.contact.full_name }}</a>
+  <p class="text-sm text-slate-500">${{ lead.value }}</p>
+</div>

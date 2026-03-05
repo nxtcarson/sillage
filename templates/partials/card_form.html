@@ -1,0 +1,9 @@
+<form method="post" action="{% if card %}{% url 'card_edit' card.pk %}{% else %}{% url 'card_create' column.board_id %}{% endif %}">
+  {% csrf_token %}
+  {% if column %}<input type="hidden" name="column_id" value="{{ column.pk }}">{% endif %}
+  {{ form.as_p }}
+  <div class="flex gap-2 mt-4">
+    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Save</button>
+    <button type="button" onclick="document.getElementById('card-modal').classList.add('hidden')" class="px-4 py-2 border rounded-lg">Cancel</button>
+  </div>
+</form>

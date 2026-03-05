@@ -1,0 +1,9 @@
+<div class="card-item p-3 bg-white dark:bg-slate-700 rounded-lg shadow cursor-move hover:shadow-md" data-card-id="{{ card.pk }}">
+  <p class="font-medium">{{ card.title }}</p>
+  {% if card.contact %}<a href="{% url 'contact_detail' card.contact.pk %}" class="text-xs text-slate-500 mt-1 block">{{ card.contact.full_name }}</a>{% endif %}
+  {% if card.due_date %}<p class="text-xs text-slate-500">{{ card.due_date }}</p>{% endif %}
+  <div class="mt-2 flex gap-2">
+    <button type="button" hx-get="{% url 'card_edit' card.pk %}" hx-target="#card-modal-content" hx-swap="innerHTML" hx-trigger="click" class="text-xs text-indigo-600 edit-card-btn">Edit</button>
+    <form method="post" action="{% url 'card_delete' card.pk %}" class="inline" onsubmit="return confirm('Delete?')">{% csrf_token %}<button type="submit" class="text-xs text-red-600">Delete</button></form>
+  </div>
+</div>

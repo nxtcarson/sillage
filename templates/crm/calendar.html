@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block page_title %}Calendar{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+  <h2 class="text-xl font-semibold">Calendar</h2>
+  <div class="flex gap-2 items-center">
+    <a href="?year={{ prev_year }}&month={{ prev_month }}" class="px-3 py-1 border rounded hover:bg-slate-100">Prev</a>
+    <span class="font-medium">{{ month }}/{{ year }}</span>
+    <a href="?year={{ next_year }}&month={{ next_month }}" class="px-3 py-1 border rounded hover:bg-slate-100">Next</a>
+  </div>
+</div>
+<div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+  <div class="grid grid-cols-7 border-b border-slate-200 dark:border-slate-700">
+    <div class="p-2 text-center text-sm font-medium text-slate-500">Sun</div>
+    <div class="p-2 text-center text-sm font-medium text-slate-500">Mon</div>
+    <div class="p-2 text-center text-sm font-medium text-slate-500">Tue</div>
+    <div class="p-2 text-center text-sm font-medium text-slate-500">Wed</div>
+    <div class="p-2 text-center text-sm font-medium text-slate-500">Thu</div>
+    <div class="p-2 text-center text-sm font-medium text-slate-500">Fri</div>
+    <div class="p-2 text-center text-sm font-medium text-slate-500">Sat</div>
+  </div>
+  {% for week in weeks %}
+  <div class="grid grid-cols-7 border-b border-slate-100 dark:border-slate-700 last:border-0">
+    {% for cell in week %}
+    <div class="min-h-[80px] p-2 border-r border-slate-100 dark:border-slate-700 last:border-r-0 {% if cell.day.month != month %}bg-slate-50 dark:bg-slate-800/50 text-slate-400{% endif %}">
+      <span class="text-sm">{{ cell.day.day }}</span>
+      {% for event in cell.events %}
+      <a href="{{ event.url }}" class="block text-xs mt-1 p-1 rounded bg-indigo-100 dark:bg-indigo-900/50 truncate">{{ event.title }}</a>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

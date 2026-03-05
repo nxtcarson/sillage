@@ -1,0 +1,12 @@
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 {% if task.completed %}opacity-60{% endif %}">
+  <td class="px-4 py-3">
+    <form method="post" action="{% url 'task_toggle' task.pk %}" class="inline">{% csrf_token %}
+      <button type="submit" class="mr-2">{{ task.completed|yesno:"☑,☐" }}</button>
+    </form>
+    {{ task.title }}
+  </td>
+  <td class="px-4 py-3">{% if task.related_contact %}{{ task.related_contact.full_name }}{% else %}-{% endif %}</td>
+  <td class="px-4 py-3">{{ task.due_date|default:"-" }}</td>
+  <td class="px-4 py-3">{{ task.assigned_to.name|default:"-" }}</td>
+  <td class="px-4 py-3 text-right"><a href="{% url 'task_edit' task.pk %}" class="text-indigo-600 text-sm">Edit</a></td>
+</tr>

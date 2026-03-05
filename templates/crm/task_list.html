@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block page_title %}Tasks{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <form method="get" class="flex gap-2">
+    <select name="completed" class="px-3 py-2 border rounded-lg" onchange="this.form.submit()">
+      <option value="">All</option>
+      <option value="0" {% if completed_filter == '0' %}selected{% endif %}>Open</option>
+      <option value="1" {% if completed_filter == '1' %}selected{% endif %}>Completed</option>
+    </select>
+  </form>
+  <a href="{% url 'task_create' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Add Task</a>
+</div>
+<div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+    <thead class="bg-slate-50 dark:bg-slate-700">
+      <tr>
+        <th class="px-4 py-3 text-left text-sm font-medium">Task</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Contact</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Due</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Assigned</th>
+        <th class="px-4 py-3 text-right text-sm font-medium">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in tasks %}
+      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 {% if task.completed %}opacity-60{% endif %}">
+        <td class="px-4 py-3">
+          <form method="post" action="{% url 'task_toggle' task.pk %}" class="inline">{% csrf_token %}
+            <button type="submit" class="mr-2">{{ task.completed|yesno:"☑,☐" }}</button>
+          </form>
+          {{ task.title }}
+        </td>
+        <td class="px-4 py-3">{% if task.related_contact %}<a href="{% url 'contact_detail' task.related_contact.pk %}">{{ task.related_contact.full_name }}</a>{% else %}-{% endif %}</td>
+        <td class="px-4 py-3">{{ task.due_date|default:"-" }}</td>
+        <td class="px-4 py-3">{{ task.assigned_to.name|default:"-" }}</td>
+        <td class="px-4 py-3 text-right"><a href="{% url 'task_edit' task.pk %}" class="text-indigo-600 text-sm">Edit</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">No tasks. <a href="{% url 'task_create' %}" class="text-indigo-600">Add one</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if tasks.has_other_pages %}
+  <div class="px-4 py-3 border-t flex justify-between">
+    {% if tasks.has_previous %}<a href="?page={{ tasks.previous_page_number }}{% if completed_filter %}&completed={{ completed_filter }}{% endif %}">Previous</a>{% endif %}
+    <span>Page {{ tasks.number }} of {{ tasks.paginator.num_pages }}</span>
+    {% if tasks.has_next %}<a href="?page={{ tasks.next_page_number }}{% if completed_filter %}&completed={{ completed_filter }}{% endif %}">Next</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

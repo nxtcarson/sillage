@@ -1,0 +1,5 @@
+<p>Delete "{{ card.title }}"?</p>
+<form method="post" action="{% url 'card_delete' card.pk %}">
+  {% csrf_token %}
+  <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg">Delete</button>
+</form>

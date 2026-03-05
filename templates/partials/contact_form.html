@@ -1,0 +1,5 @@
+<form method="post" hx-post="{% if contact %}{% url 'contact_edit' contact.pk %}{% else %}{% url 'contact_create' %}{% endif %}" hx-swap="outerHTML" hx-target="closest tr">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block page_title %}Policy {{ policy.policy_number|default:"Draft" }}{% endblock %}
+{% block content %}
+<div class="flex justify-between items-start mb-6">
+  <div>
+    <h2 class="text-2xl font-bold">{{ policy.policy_number|default:"Draft" }}</h2>
+    <p class="text-slate-500">{{ policy.carrier }} · {{ policy.get_type_display }}</p>
+    <span class="inline-block mt-2 px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ policy.status }}</span>
+  </div>
+  <a href="{% url 'policy_edit' policy.pk %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100">Edit</a>
+</div>
+<div class="grid md:grid-cols-2 gap-6">
+  <div>
+    <h3 class="font-semibold mb-2">Details</h3>
+    <dl class="space-y-2">
+      <dt class="text-slate-500">Contact</dt>
+      <dd><a href="{% url 'contact_detail' policy.contact.pk %}" class="text-indigo-600">{{ policy.contact.full_name }}</a></dd>
+      <dt class="text-slate-500">Premium</dt>
+      <dd>${{ policy.premium }}</dd>
+      <dt class="text-slate-500">Commission</dt>
+      <dd>${{ policy.commission }}</dd>
+      <dt class="text-slate-500">Effective</dt>
+      <dd>{{ policy.effective_date|default:"-" }}</dd>
+      <dt class="text-slate-500">Expiry</dt>
+      <dd>{{ policy.expiry_date|default:"-" }}</dd>
+    </dl>
+  </div>
+</div>
+{% endblock %}

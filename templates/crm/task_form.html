@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block page_title %}{% if task %}Edit{% else %}Add{% endif %} Task{% endblock %}
+{% block content %}
+<form method="post" class="max-w-xl space-y-4">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <div class="flex gap-2">
+    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Save</button>
+    <a href="{% url 'task_list' %}" class="px-4 py-2 border rounded-lg">Cancel</a>
+  </div>
+</form>
+{% endblock %}

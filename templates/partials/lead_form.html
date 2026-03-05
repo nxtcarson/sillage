@@ -1,0 +1,5 @@
+<form method="post" action="{% url 'lead_create' %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Add Lead</button>
+</form>

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block page_title %}{{ contact.full_name }}{% endblock %}
+{% block content %}
+<div class="flex justify-between items-start mb-6">
+  <div>
+    <h2 class="text-2xl font-bold">{{ contact.full_name }}</h2>
+    <p class="text-slate-500">{{ contact.email }} · {{ contact.phone }}</p>
+    <span class="inline-block mt-2 px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ contact.status }}</span>
+  </div>
+  <div class="flex gap-2">
+    <a href="{% url 'contact_edit' contact.pk %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Edit</a>
+    <a href="{% url 'contact_delete' contact.pk %}" class="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50">Delete</a>
+  </div>
+</div>
+<div class="grid md:grid-cols-2 gap-6">
+  <div>
+    <h3 class="font-semibold mb-2">Policies</h3>
+    {% for policy in policies %}
+    <a href="{% url 'policy_detail' policy.pk %}" class="block p-3 rounded-lg border dark:border-slate-600 mb-2 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+      {{ policy.carrier }} - {{ policy.get_type_display }} ({{ policy.status }})
+    </a>
+    {% empty %}
+    <p class="text-slate-500">No policies</p>
+    {% endfor %}
+    <a href="{% url 'policy_create' %}?contact={{ contact.pk }}" class="text-indigo-600 text-sm">+ Add policy</a>
+  </div>
+  <div>
+    <h3 class="font-semibold mb-2">Tasks</h3>
+    {% for task in tasks %}
+    <div class="flex items-center gap-2 p-3 rounded-lg border dark:border-slate-600 mb-2">
+      <form method="post" action="{% url 'task_toggle' task.pk %}" class="contents">{% csrf_token %}
+        <button type="submit" class="text-sm">{{ task.completed|yesno:"☑,☐" }}</button>
+      </form>
+      <a href="{% url 'task_edit' task.pk %}" class="flex-1">{{ task.title }}</a>
+      {% if task.due_date %}<span class="text-xs text-slate-500">{{ task.due_date }}</span>{% endif %}
+    </div>
+    {% empty %}
+    <p class="text-slate-500">No tasks</p>
+    {% endfor %}
+  </div>
+</div>
+<div class="mt-8">
+  <h3 class="font-semibold mb-2">Activity</h3>
+  <form method="post" action="{% url 'activity_create' contact.pk %}" class="mb-4 flex gap-2">
+    {% csrf_token %}
+    <select name="type" class="px-3 py-2 border rounded-lg">
+      <option value="note">Note</option>
+      <option value="call">Call</option>
+      <option value="email">Email</option>
+      <option value="meeting">Meeting</option>
+    </select>
+    <input type="text" name="description" placeholder="Add activity..." class="flex-1 px-3 py-2 border rounded-lg" required>
+    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Add</button>
+  </form>
+  <div class="space-y-2">
+    {% for activity in activities %}
+    <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+      <span class="text-xs text-slate-500">{{ activity.timestamp|date:"M d, H:i" }} · {{ activity.get_type_display }}{% if activity.user %} · {{ activity.user.name }}{% endif %}</span>
+      <p class="mt-1">{{ activity.description }}</p>
+    </div>
+    {% empty %}
+    <p class="text-slate-500">No activity yet</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block page_title %}Contacts{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <form method="get" class="flex gap-2 flex-wrap">
+    <input type="text" name="q" value="{{ search }}" placeholder="Search..." class="px-3 py-2 border rounded-lg">
+    <select name="status" class="px-3 py-2 border rounded-lg">
+      <option value="">All statuses</option>
+      <option value="lead" {% if status_filter == 'lead' %}selected{% endif %}>Lead</option>
+      <option value="prospect" {% if status_filter == 'prospect' %}selected{% endif %}>Prospect</option>
+      <option value="client" {% if status_filter == 'client' %}selected{% endif %}>Client</option>
+    </select>
+    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Filter</button>
+  </form>
+  <a href="{% url 'contact_create' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Add Contact</a>
+</div>
+<div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+    <thead class="bg-slate-50 dark:bg-slate-700">
+      <tr>
+        <th class="px-4 py-3 text-left text-sm font-medium">Name</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Email</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Status</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Assigned</th>
+        <th class="px-4 py-3 text-right text-sm font-medium">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+      {% for contact in contacts %}
+      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+        <td class="px-4 py-3">
+          <a href="{% url 'contact_detail' contact.pk %}" class="text-indigo-600 hover:underline font-medium">{{ contact.full_name }}</a>
+        </td>
+        <td class="px-4 py-3">{{ contact.email }}</td>
+        <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ contact.status }}</span></td>
+        <td class="px-4 py-3">{{ contact.assigned_agent.name|default:"-" }}</td>
+        <td class="px-4 py-3 text-right">
+          <a href="{% url 'contact_edit' contact.pk %}" class="text-indigo-600 hover:underline text-sm">Edit</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">No contacts yet. <a href="{% url 'contact_create' %}" class="text-indigo-600">Add one</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if contacts.has_other_pages %}
+  <div class="px-4 py-3 border-t flex justify-between">
+    {% if contacts.has_previous %}<a href="?page={{ contacts.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="text-indigo-600">Previous</a>{% else %}<span></span>{% endif %}
+    <span>Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}</span>
+    {% if contacts.has_next %}<a href="?page={{ contacts.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="text-indigo-600">Next</a>{% else %}<span></span>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

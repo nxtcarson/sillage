@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block page_title %}Policies{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <form method="get" class="flex gap-2">
+    <select name="status" class="px-3 py-2 border rounded-lg">
+      <option value="">All statuses</option>
+      <option value="quoted" {% if status_filter == 'quoted' %}selected{% endif %}>Quoted</option>
+      <option value="bound" {% if status_filter == 'bound' %}selected{% endif %}>Bound</option>
+      <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+      <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+      <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+    </select>
+    <select name="type" class="px-3 py-2 border rounded-lg">
+      <option value="">All types</option>
+      <option value="auto" {% if type_filter == 'auto' %}selected{% endif %}>Auto</option>
+      <option value="home" {% if type_filter == 'home' %}selected{% endif %}>Home</option>
+      <option value="life" {% if type_filter == 'life' %}selected{% endif %}>Life</option>
+      <option value="health" {% if type_filter == 'health' %}selected{% endif %}>Health</option>
+      <option value="commercial" {% if type_filter == 'commercial' %}selected{% endif %}>Commercial</option>
+    </select>
+    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Filter</button>
+  </form>
+  <a href="{% url 'policy_create' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Add Policy</a>
+</div>
+<div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+    <thead class="bg-slate-50 dark:bg-slate-700">
+      <tr>
+        <th class="px-4 py-3 text-left text-sm font-medium">Policy #</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Contact</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Carrier</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Type</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Premium</th>
+        <th class="px-4 py-3 text-left text-sm font-medium">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for policy in policies %}
+      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+        <td class="px-4 py-3"><a href="{% url 'policy_detail' policy.pk %}" class="text-indigo-600 hover:underline">{{ policy.policy_number|default:"Draft" }}</a></td>
+        <td class="px-4 py-3"><a href="{% url 'contact_detail' policy.contact.pk %}" class="hover:underline">{{ policy.contact.full_name }}</a></td>
+        <td class="px-4 py-3">{{ policy.carrier }}</td>
+        <td class="px-4 py-3">{{ policy.get_type_display }}</td>
+        <td class="px-4 py-3">${{ policy.premium }}</td>
+        <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ policy.status }}</span></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No policies. <a href="{% url 'policy_create' %}" class="text-indigo-600">Add one</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if policies.has_other_pages %}
+  <div class="px-4 py-3 border-t flex justify-between">
+    {% if policies.has_previous %}<a href="?page={{ policies.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">Previous</a>{% endif %}
+    <span>Page {{ policies.number }} of {{ policies.paginator.num_pages }}</span>
+    {% if policies.has_next %}<a href="?page={{ policies.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">Next</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

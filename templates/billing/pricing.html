@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block page_title %}Pricing{% endblock %}
+{% block content %}
+<div class="text-center mb-12">
+  <h1 class="text-3xl font-bold mb-2">Choose your plan</h1>
+  <p class="text-slate-500">Manage your insurance pipeline with the right tools</p>
+</div>
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 border border-slate-200 dark:border-slate-700">
+    <h3 class="text-lg font-semibold">Free</h3>
+    <p class="mt-2 text-3xl font-bold">$0</p>
+    <p class="text-sm text-slate-500">free forever</p>
+    <ul class="mt-4 space-y-2 text-sm">
+      <li>Up to 2 seats</li>
+      <li>Up to 3 boards</li>
+      <li>100 contacts</li>
+      <li>500MB storage</li>
+    </ul>
+    <form method="post" action="{% url 'checkout_create' %}" class="mt-6">
+      {% csrf_token %}
+      <input type="hidden" name="tier" value="free">
+      <button type="submit" class="w-full py-2 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Get started</button>
+    </form>
+  </div>
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 border border-slate-200 dark:border-slate-700">
+    <h3 class="text-lg font-semibold">Basic</h3>
+    <p class="mt-2 text-3xl font-bold">$9</p>
+    <p class="text-sm text-slate-500">per seat / month</p>
+    <ul class="mt-4 space-y-2 text-sm">
+      <li>Monday AI</li>
+      <li>Unlimited viewers</li>
+      <li>5GB storage</li>
+      <li>Priority support</li>
+    </ul>
+    <form method="post" action="{% url 'checkout_create' %}" class="mt-6">
+      {% csrf_token %}
+      <input type="hidden" name="tier" value="basic">
+      <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Subscribe</button>
+    </form>
+  </div>
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 border-2 border-indigo-500 relative">
+    <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-indigo-500 text-white text-xs rounded">Most Popular</span>
+    <h3 class="text-lg font-semibold">Standard</h3>
+    <p class="mt-2 text-3xl font-bold">$12</p>
+    <p class="text-sm text-slate-500">per seat / month</p>
+    <ul class="mt-4 space-y-2 text-sm">
+      <li>Timeline & Gantt</li>
+      <li>Calendar view</li>
+      <li>250 automations/mo</li>
+      <li>Guest access</li>
+    </ul>
+    <form method="post" action="{% url 'checkout_create' %}" class="mt-6">
+      {% csrf_token %}
+      <input type="hidden" name="tier" value="standard">
+      <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Subscribe</button>
+    </form>
+  </div>
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 border border-slate-200 dark:border-slate-700">
+    <h3 class="text-lg font-semibold">Pro</h3>
+    <p class="mt-2 text-3xl font-bold">$19</p>
+    <p class="text-sm text-slate-500">per seat / month</p>
+    <ul class="mt-4 space-y-2 text-sm">
+      <li>Private boards</li>
+      <li>Time tracking</li>
+      <li>25K automations/mo</li>
+      <li>Advanced analytics</li>
+    </ul>
+    <form method="post" action="{% url 'checkout_create' %}" class="mt-6">
+      {% csrf_token %}
+      <input type="hidden" name="tier" value="pro">
+      <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Subscribe</button>
+    </form>
+  </div>
+</div>
+{% if user_profile %}
+<div class="mt-12 text-center">
+  <form method="post" action="{% url 'customer_portal' %}" class="inline">
+    {% csrf_token %}
+    <button type="submit" class="text-indigo-600 hover:underline">Manage billing</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

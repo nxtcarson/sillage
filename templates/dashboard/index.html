@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+      <p class="text-sm text-slate-500">Contacts</p>
+      <p class="text-2xl font-bold">{{ contacts_count }}</p>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+      <p class="text-sm text-slate-500">Active Policies</p>
+      <p class="text-2xl font-bold">{{ active_policies }}</p>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+      <p class="text-sm text-slate-500">Revenue</p>
+      <p class="text-2xl font-bold">${{ revenue|floatformat:0 }}</p>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+      <p class="text-sm text-slate-500">Conversion</p>
+      <p class="text-2xl font-bold">{{ conversion|floatformat:1 }}%</p>
+    </div>
+  </div>
+  <div class="grid lg:grid-cols-2 gap-6">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+      <h3 class="font-semibold mb-4">Pipeline</h3>
+      <canvas id="pipelineChart" height="200"></canvas>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+      <h3 class="font-semibold mb-4">Recent Activity</h3>
+      <div class="space-y-2 max-h-64 overflow-y-auto">
+        {% for activity in activities %}
+        <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+          <span class="text-xs text-slate-500">{{ activity.timestamp|date:"M d, H:i" }} · {{ activity.get_type_display }}{% if activity.user %} · {{ activity.user.name }}{% endif %}</span>
+          <p class="text-sm mt-1">{{ activity.description|truncatewords:15 }}</p>
+          <a href="{% url 'contact_detail' activity.contact.pk %}" class="text-xs text-indigo-600">{{ activity.contact.full_name }}</a>
+        </div>
+        {% empty %}
+        <p class="text-slate-500">No recent activity</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="grid lg:grid-cols-2 gap-6">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+      <h3 class="font-semibold mb-4">Upcoming Tasks</h3>
+      <div class="space-y-2">
+        {% for task in upcoming_tasks %}
+        <div class="flex items-center gap-2 p-3 rounded-lg border dark:border-slate-600">
+          <a href="{% url 'task_edit' task.pk %}" class="flex-1">{{ task.title }}</a>
+          <span class="text-xs text-slate-500">{{ task.due_date }}</span>
+          {% if task.related_contact %}<a href="{% url 'contact_detail' task.related_contact.pk %}" class="text-xs text-indigo-600">{{ task.related_contact.full_name }}</a>{% endif %}
+        </div>
+        {% empty %}
+        <p class="text-slate-500">No upcoming tasks</p>
+        {% endfor %}
+      </div>
+      <a href="{% url 'task_list' %}" class="text-indigo-600 text-sm mt-2 inline-block">View all tasks</a>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+      <h3 class="font-semibold mb-4">Policy Renewals (30 days)</h3>
+      <div class="space-y-2">
+        {% for policy in renewals %}
+        <div class="flex items-center gap-2 p-3 rounded-lg border dark:border-slate-600">
+          <a href="{% url 'policy_detail' policy.pk %}" class="flex-1">{{ policy.policy_number|default:"Draft" }} - {{ policy.contact.full_name }}</a>
+          <span class="text-xs text-slate-500">{{ policy.expiry_date }}</span>
+        </div>
+        {% empty %}
+        <p class="text-slate-500">No renewals in next 30 days</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ctx = document.getElementById('pipelineChart');
+  if (!ctx) return;
+  const data = {{ pipeline_data_json|safe }};
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.map(d => d.name),
+      datasets: [{
+        label: 'Leads',
+        data: data.map(d => d.count),
+        backgroundColor: 'rgba(99, 102, 241, 0.8)',
+      }, {
+        label: 'Value ($)',
+        data: data.map(d => d.value),
+        backgroundColor: 'rgba(34, 197, 94, 0.8)',
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+});
+</script>
+{% endblock %}

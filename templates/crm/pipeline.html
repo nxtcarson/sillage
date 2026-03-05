@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block page_title %}Pipeline{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+  <h2 class="text-xl font-semibold">Sales Pipeline</h2>
+  <a href="{% url 'lead_create' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Add Lead</a>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-4">
+  {% for stage in stages %}
+  <div class="min-w-[280px] flex-shrink-0 bg-slate-100 dark:bg-slate-800 rounded-lg p-4" style="border-top: 4px solid {{ stage.color }}">
+    <h3 class="font-semibold mb-2">{{ stage.name }}</h3>
+    <p class="text-sm text-slate-500 mb-4">{{ stage.leads.count }} leads</p>
+    <div class="space-y-2" id="stage-{{ stage.pk }}">
+      {% for lead in stage.leads.all %}
+      <div class="p-3 bg-white dark:bg-slate-700 rounded-lg shadow-sm">
+        <a href="{% url 'contact_detail' lead.contact.pk %}" class="font-medium">{{ lead.contact.full_name }}</a>
+        <p class="text-sm text-slate-500">${{ lead.value }}</p>
+        <form method="post" action="{% url 'lead_move' lead.pk %}" class="mt-2">
+          {% csrf_token %}
+          <select name="stage_id" onchange="if(this.value) this.form.submit()" class="text-xs border rounded px-2 py-1 dark:bg-slate-600 dark:border-slate-500">
+            <option value="">Move to...</option>
+            {% for s in stages %}
+            {% if s.pk != stage.pk %}<option value="{{ s.pk }}">{{ s.name }}</option>{% endif %}
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+      {% empty %}
+      <p class="text-slate-500 text-sm">No leads</p>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

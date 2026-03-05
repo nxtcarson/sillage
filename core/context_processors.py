@@ -1,0 +1,22 @@
+import os
+
+
+def user_profile(request):
+    profile = None
+    user_id = request.session.get("user_id")
+    if user_id:
+        try:
+            from accounts.models import UserProfile
+            profile = UserProfile.objects.select_related("organization").get(id=user_id)
+        except Exception:
+            pass
+    return {"user_profile": profile}
+
+
+def firebase_config(request):
+    return {
+        "firebase_api_key": os.environ.get("FIREBASE_API_KEY", ""),
+        "firebase_auth_domain": os.environ.get("FIREBASE_AUTH_DOMAIN", ""),
+        "firebase_project_id": os.environ.get("FIREBASE_PROJECT_ID", ""),
+        "firebase_storage_bucket": os.environ.get("FIREBASE_STORAGE_BUCKET", ""),
+    }

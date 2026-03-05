@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.env.local
+venv/
+.venv/
+node_modules/
+*.sqlite3
+*.log
+.DS_Store
+static/css/output.css
+*.egg-info/
+dist/
+build/
+firebase-service-account.json

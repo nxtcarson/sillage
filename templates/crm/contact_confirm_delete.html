@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block page_title %}Delete Contact{% endblock %}
+{% block content %}
+<div class="max-w-md">
+  <p class="mb-4">Are you sure you want to delete {{ contact.full_name }}?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg">Delete</button>
+    <a href="{% url 'contact_detail' contact.pk %}" class="px-4 py-2 border rounded-lg ml-2">Cancel</a>
+  </form>
+</div>
+{% endblock %}
