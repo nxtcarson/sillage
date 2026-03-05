@@ -11,7 +11,7 @@
   </div>
   {% endfor %}
   <div class="flex gap-2">
-    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Save</button>
+    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Save</button>
     <a href="{% if board %}{% url 'board_detail' board.pk %}{% else %}{% url 'board_list' %}{% endif %}" class="px-4 py-2 border rounded-lg">Cancel</a>
   </div>
 </form>

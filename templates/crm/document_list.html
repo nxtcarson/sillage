@@ -31,12 +31,12 @@
     <tbody>
       {% for doc in documents %}
       <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-        <td class="px-4 py-3"><a href="{{ doc.firebase_storage_url }}" target="_blank" class="text-indigo-600 hover:underline">{{ doc.name }}</a></td>
+        <td class="px-4 py-3"><a href="{{ doc.firebase_storage_url }}" target="_blank" class="text-brand-600 hover:underline">{{ doc.name }}</a></td>
         <td class="px-4 py-3">{% if doc.contact %}<a href="{% url 'contact_detail' doc.contact.pk %}">{{ doc.contact.full_name }}</a>{% else %}-{% endif %}</td>
         <td class="px-4 py-3">{% if doc.policy %}{{ doc.policy.policy_number|default:"-" }}{% else %}-{% endif %}</td>
         <td class="px-4 py-3">{{ doc.uploaded_at|date:"M d, Y" }}</td>
         <td class="px-4 py-3 text-right">
-          <a href="{{ doc.firebase_storage_url }}" target="_blank" class="text-indigo-600 text-sm">Download</a>
+          <a href="{{ doc.firebase_storage_url }}" target="_blank" class="text-brand-600 text-sm">Download</a>
           <form method="post" action="{% url 'document_delete' doc.pk %}" class="inline ml-2" onsubmit="return confirm('Delete?')">{% csrf_token %}<button type="submit" class="text-red-600 text-sm">Delete</button></form>
         </td>
       </tr>

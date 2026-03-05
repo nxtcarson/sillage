@@ -3,7 +3,7 @@
 {% block content %}
 <div class="mb-6 flex justify-between items-center">
   <h2 class="text-xl font-semibold">Sales Pipeline</h2>
-  <a href="{% url 'lead_create' %}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Add Lead</a>
+  <a href="{% url 'lead_create' %}" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Add Lead</a>
 </div>
 <div class="flex gap-4 overflow-x-auto pb-4">
   {% for stage in stages %}

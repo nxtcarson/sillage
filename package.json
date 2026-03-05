@@ -1,5 +1,5 @@
 {
-  "name": "insurance-crm",
+  "name": "sillage",
   "private": true,
   "scripts": {
     "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",

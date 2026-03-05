@@ -21,9 +21,9 @@ def pricing(request):
     if not plans:
         for t, n, p, f in [
             ("free", "Free", 0, {"items": ["Up to 2 seats", "Up to 3 boards", "100 contacts", "500MB storage"]}),
-            ("basic", "Basic", 9, {"items": ["Monday AI", "Unlimited viewers", "5GB storage", "Priority support"]}),
-            ("standard", "Standard", 12, {"items": ["Timeline & Gantt", "Calendar view", "250 automations/mo", "Guest access"]}),
-            ("pro", "Pro", 19, {"items": ["Private boards", "Time tracking", "25K automations/mo", "Advanced analytics"]}),
+            ("basic", "Basic", 4, {"items": ["5 seats", "5GB storage", "Email support"]}),
+            ("standard", "Standard", 8, {"items": ["10 seats", "Calendar view", "20GB storage"]}),
+            ("pro", "Pro", 12, {"items": ["25 seats", "Private boards", "50GB storage"]}),
         ]:
             Plan.objects.get_or_create(tier=t, defaults={"name": n, "price": p, "features": f})
         plans = list(Plan.objects.all().order_by("price"))

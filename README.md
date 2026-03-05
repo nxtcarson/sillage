@@ -1,4 +1,4 @@
-# Insurance Sales CRM
+# Sillage
 
 A full-featured insurance sales CRM built with Django, Firebase, HTMX, Tailwind CSS, and Stripe.
 

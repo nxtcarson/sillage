@@ -22,7 +22,7 @@
         {% if card.contact %}<a href="{% url 'contact_detail' card.contact.pk %}" class="text-xs text-slate-500 mt-1 block hover:underline">{{ card.contact.full_name }}</a>{% endif %}
         {% if card.due_date %}<p class="text-xs text-slate-500">{{ card.due_date }}</p>{% endif %}
         <div class="mt-2 flex gap-2">
-          <button type="button" hx-get="{% url 'card_edit' card.pk %}" hx-target="#card-modal-content" hx-swap="innerHTML" hx-trigger="click" class="text-xs text-indigo-600 edit-card-btn">Edit</button>
+          <button type="button" hx-get="{% url 'card_edit' card.pk %}" hx-target="#card-modal-content" hx-swap="innerHTML" hx-trigger="click" class="text-xs text-brand-600 edit-card-btn">Edit</button>
           <form method="post" action="{% url 'card_delete' card.pk %}" class="inline" onsubmit="return confirm('Delete this card?')">{% csrf_token %}<button type="submit" class="text-xs text-red-600">Delete</button></form>
         </div>
       </div>
@@ -34,7 +34,7 @@
       {% csrf_token %}
       <input type="hidden" name="column_id" value="{{ column.pk }}">
       <input type="text" name="title" placeholder="+ Add card" class="w-full px-3 py-2 border rounded-lg text-sm dark:bg-slate-700 dark:border-slate-600" required>
-      <button type="submit" class="mt-2 text-sm text-indigo-600">Add</button>
+      <button type="submit" class="mt-2 text-sm text-brand-600">Add</button>
     </form>
   </div>
   {% endfor %}

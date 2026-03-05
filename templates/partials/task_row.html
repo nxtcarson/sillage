@@ -8,5 +8,5 @@
   <td class="px-4 py-3">{% if task.related_contact %}{{ task.related_contact.full_name }}{% else %}-{% endif %}</td>
   <td class="px-4 py-3">{{ task.due_date|default:"-" }}</td>
   <td class="px-4 py-3">{{ task.assigned_to.name|default:"-" }}</td>
-  <td class="px-4 py-3 text-right"><a href="{% url 'task_edit' task.pk %}" class="text-indigo-600 text-sm">Edit</a></td>
+  <td class="px-4 py-3 text-right"><a href="{% url 'task_edit' task.pk %}" class="text-brand-600 text-sm">Edit</a></td>
 </tr>

@@ -22,7 +22,7 @@
     {% empty %}
     <p class="text-slate-500">No policies</p>
     {% endfor %}
-    <a href="{% url 'policy_create' %}?contact={{ contact.pk }}" class="text-indigo-600 text-sm">+ Add policy</a>
+    <a href="{% url 'policy_create' %}?contact={{ contact.pk }}" class="text-brand-600 text-sm">+ Add policy</a>
   </div>
   <div>
     <h3 class="font-semibold mb-2">Tasks</h3>
@@ -50,7 +50,7 @@
       <option value="meeting">Meeting</option>
     </select>
     <input type="text" name="description" placeholder="Add activity..." class="flex-1 px-3 py-2 border rounded-lg" required>
-    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Add</button>
+    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Add</button>
   </form>
   <div class="space-y-2">
     {% for activity in activities %}

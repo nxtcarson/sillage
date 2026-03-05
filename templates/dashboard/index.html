@@ -32,7 +32,7 @@
         <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
           <span class="text-xs text-slate-500">{{ activity.timestamp|date:"M d, H:i" }} · {{ activity.get_type_display }}{% if activity.user %} · {{ activity.user.name }}{% endif %}</span>
           <p class="text-sm mt-1">{{ activity.description|truncatewords:15 }}</p>
-          <a href="{% url 'contact_detail' activity.contact.pk %}" class="text-xs text-indigo-600">{{ activity.contact.full_name }}</a>
+          <a href="{% url 'contact_detail' activity.contact.pk %}" class="text-xs text-brand-600">{{ activity.contact.full_name }}</a>
         </div>
         {% empty %}
         <p class="text-slate-500">No recent activity</p>
@@ -48,13 +48,13 @@
         <div class="flex items-center gap-2 p-3 rounded-lg border dark:border-slate-600">
           <a href="{% url 'task_edit' task.pk %}" class="flex-1">{{ task.title }}</a>
           <span class="text-xs text-slate-500">{{ task.due_date }}</span>
-          {% if task.related_contact %}<a href="{% url 'contact_detail' task.related_contact.pk %}" class="text-xs text-indigo-600">{{ task.related_contact.full_name }}</a>{% endif %}
+          {% if task.related_contact %}<a href="{% url 'contact_detail' task.related_contact.pk %}" class="text-xs text-brand-600">{{ task.related_contact.full_name }}</a>{% endif %}
         </div>
         {% empty %}
         <p class="text-slate-500">No upcoming tasks</p>
         {% endfor %}
       </div>
-      <a href="{% url 'task_list' %}" class="text-indigo-600 text-sm mt-2 inline-block">View all tasks</a>
+      <a href="{% url 'task_list' %}" class="text-brand-600 text-sm mt-2 inline-block">View all tasks</a>
     </div>
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
       <h3 class="font-semibold mb-4">Policy Renewals (30 days)</h3>
