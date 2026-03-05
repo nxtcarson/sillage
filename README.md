@@ -20,20 +20,18 @@ pip install -r requirements.txt
 npm install
 ```
 
-2. **Environment variables** — choose one:
+2. **Environment variables** — Doppler (syncs across machines)
 
-**Option A: Doppler (recommended — syncs across machines)**
+```powershell
+winget install Doppler.Doppler
+.\doppler-setup.ps1
+```
 
-1. Sign up at [doppler.com](https://doppler.com) (free)
-2. Create a project, add a `dev` config
-3. Add all vars from `.env.example` in the Doppler dashboard
-4. Install CLI: `winget install Doppler.Doppler` (Windows) or see [doppler.com/docs](https://docs.doppler.com/docs/install-cli)
-5. From project root: `doppler login` then `doppler setup` (select your project)
-6. Run: `doppler run -- python manage.py runserver` or `.\run.ps1`
+See [DOPPLER_SETUP.md](DOPPLER_SETUP.md) for the full variable list and where to get each value. If you have a `.env` file, the setup script can upload it to Doppler.
 
-On another computer: clone, `doppler login`, `doppler setup`, then `.\run.ps1`. No need to copy `.env`.
+Run the app: `.\run.ps1`
 
-**Option B: Local .env file**
+**Alternative: Local .env file**
 
 Copy `.env.example` to `.env` and fill in your keys. `.env` is gitignored.
 
