@@ -43,7 +43,8 @@ def require_role(*roles):
                 if request.headers.get("HX-Request"):
                     return HttpResponseForbidden("<p>Please log in.</p>")
                 return redirect(reverse("login"))
-            org = getattr(request, "current_org", None)
+            from core.org import get_current_org
+            org = get_current_org(request)
             if not org:
                 return redirect(reverse("dashboard"))
             from accounts.models import OrganizationMembership

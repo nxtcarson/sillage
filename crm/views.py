@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 import json
-from core.decorators import require_auth
+from core.decorators import require_auth, require_role
 from .models import Contact, Lead, Policy, PipelineStage, Task, Activity
 from .forms import ContactForm, LeadForm, PolicyForm, TaskForm, ActivityForm
 
@@ -152,6 +152,7 @@ def contact_detail(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def contact_create(request):
     org = _get_org(request)
     if not org:
@@ -189,6 +190,7 @@ def contact_edit(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def contact_delete(request, pk):
     org = _get_org(request)
     if not org:
@@ -252,6 +254,7 @@ def policy_detail(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def policy_create(request):
     org = _get_org(request)
     if not org:
@@ -270,6 +273,7 @@ def policy_create(request):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def policy_edit(request, pk):
     org = _get_org(request)
     if not org:
@@ -300,6 +304,7 @@ def task_list(request):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def task_create(request):
     org = _get_org(request)
     if not org:
@@ -320,6 +325,7 @@ def task_create(request):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def task_edit(request, pk):
     org = _get_org(request)
     if not org:
@@ -339,6 +345,7 @@ def task_edit(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def task_toggle(request, pk):
     org = _get_org(request)
     if not org:
@@ -352,6 +359,7 @@ def task_toggle(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def activity_create(request, contact_pk):
     org = _get_org(request)
     if not org:
@@ -373,6 +381,7 @@ def activity_create(request, contact_pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def lead_create(request):
     org = _get_org(request)
     if not org:
@@ -391,6 +400,7 @@ def lead_create(request):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def lead_move(request, pk):
     org = _get_org(request)
     if not org:

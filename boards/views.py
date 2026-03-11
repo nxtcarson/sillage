@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
-from core.decorators import require_auth
+from core.decorators import require_auth, require_role
 from .models import Board, Column, Card
 from .forms import BoardForm, ColumnForm, CardForm
 
@@ -31,6 +31,7 @@ def board_detail(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def board_create(request):
     org = _get_org(request)
     if not org:
@@ -49,6 +50,7 @@ def board_create(request):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def board_edit(request, pk):
     org = _get_org(request)
     if not org:
@@ -62,6 +64,7 @@ def board_edit(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def board_delete(request, pk):
     org = _get_org(request)
     if not org:
@@ -74,6 +77,7 @@ def board_delete(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 @require_POST
 def card_create(request, board_pk):
     org = _get_org(request)
@@ -101,6 +105,7 @@ def card_create(request, board_pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 @require_POST
 def card_move(request, pk):
     org = _get_org(request)
@@ -120,6 +125,7 @@ def card_move(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def card_edit(request, pk):
     org = _get_org(request)
     if not org:
@@ -139,6 +145,7 @@ def card_edit(request, pk):
 
 
 @require_auth
+@require_role("owner", "admin", "agent")
 def card_delete(request, pk):
     org = _get_org(request)
     if not org:
