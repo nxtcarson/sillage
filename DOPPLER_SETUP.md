@@ -19,14 +19,21 @@ In your project → **dev** config, add each variable. Get values from Firebase 
 | `FIREBASE_API_KEY` | Firebase Console → Project settings → Your apps → SDK config |
 | `FIREBASE_AUTH_DOMAIN` | `your-project.firebaseapp.com` |
 | `FIREBASE_STORAGE_BUCKET` | `your-project.firebasestorage.app` |
-| `FIREBASE_PRIVATE_KEY_ID` | Service account JSON (Firebase Console → Service accounts) |
+| `FIREBASE_PRIVATE_KEY_ID` | Service account JSON (Firebase Console → Service accounts → Generate new private key) |
 | `FIREBASE_PRIVATE_KEY` | Service account JSON — use `\n` for newlines |
 | `FIREBASE_CLIENT_EMAIL` | Service account JSON |
 | `FIREBASE_CLIENT_ID` | Service account JSON |
 | `STRIPE_SECRET_KEY` | Stripe Dashboard → Developers → API keys |
 | `STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard → Developers → API keys |
 | `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → Webhooks (optional for dev) |
+| `STRIPE_PRICE_BASIC` | Stripe Dashboard → Products → Create product → Copy price ID (e.g. price_xxx) |
+| `STRIPE_PRICE_STANDARD` | Same as above for Standard plan |
+| `STRIPE_PRICE_PRO` | Same as above for Pro plan |
 | `DATABASE_URL` | `sqlite:///db.sqlite3` |
+
+**Firebase Admin quick upload:** Download `firebase-service-account.json` from Firebase Console (Project settings → Service accounts → Generate new private key), place it in the project root, then run `python scripts/upload_firebase_to_doppler.py`. Or run `.\doppler-setup.ps1` — it will offer to upload it if the file exists.
+
+**Authorized domains:** Firebase Console → Build → Authentication → Settings → Authorized domains. Add `localhost` and `127.0.0.1` if missing. On localhost, Google sign-in uses redirect (not popup) to avoid browser privacy restrictions.
 
 ## 3. Install Doppler CLI
 

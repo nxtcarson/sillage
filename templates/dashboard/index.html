@@ -27,7 +27,7 @@
     </div>
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
       <h3 class="font-semibold mb-4">Recent Activity</h3>
-      <div class="space-y-2 max-h-64 overflow-y-auto">
+      <div class="space-y-2 min-h-[320px] max-h-[480px] overflow-y-auto">
         {% for activity in activities %}
         <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
           <span class="text-xs text-slate-500">{{ activity.timestamp|date:"M d, H:i" }} · {{ activity.get_type_display }}{% if activity.user %} · {{ activity.user.name }}{% endif %}</span>
@@ -85,16 +85,36 @@ document.addEventListener('DOMContentLoaded', function() {
         label: 'Leads',
         data: data.map(d => d.count),
         backgroundColor: 'rgba(99, 102, 241, 0.8)',
+        yAxisID: 'yCount',
+        order: 1,
       }, {
         label: 'Value ($)',
         data: data.map(d => d.value),
         backgroundColor: 'rgba(34, 197, 94, 0.8)',
+        yAxisID: 'yValue',
+        order: 2,
       }]
     },
     options: {
       responsive: true,
       plugins: { legend: { position: 'bottom' } },
-      scales: { y: { beginAtZero: true } }
+      scales: {
+        yCount: {
+          type: 'linear',
+          position: 'left',
+          beginAtZero: true,
+          ticks: { stepSize: 1 },
+          title: { display: true, text: 'Leads' },
+        },
+        yValue: {
+          type: 'linear',
+          position: 'right',
+          beginAtZero: true,
+          grid: { drawOnChartArea: false },
+          ticks: { callback: (v) => '$' + v.toLocaleString() },
+          title: { display: true, text: 'Value ($)' },
+        },
+      },
     }
   });
 });

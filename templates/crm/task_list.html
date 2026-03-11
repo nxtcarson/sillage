@@ -3,7 +3,7 @@
 {% block content %}
 <div class="flex justify-between items-center mb-6">
   <form method="get" class="flex gap-2">
-    <select name="completed" class="px-3 py-2 border rounded-lg" onchange="this.form.submit()">
+    <select name="completed" class="px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100" onchange="this.form.submit()">
       <option value="">All</option>
       <option value="0" {% if completed_filter == '0' %}selected{% endif %}>Open</option>
       <option value="1" {% if completed_filter == '1' %}selected{% endif %}>Completed</option>
@@ -42,7 +42,7 @@
     </tbody>
   </table>
   {% if tasks.has_other_pages %}
-  <div class="px-4 py-3 border-t flex justify-between">
+  <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-between">
     {% if tasks.has_previous %}<a href="?page={{ tasks.previous_page_number }}{% if completed_filter %}&completed={{ completed_filter }}{% endif %}">Previous</a>{% endif %}
     <span>Page {{ tasks.number }} of {{ tasks.paginator.num_pages }}</span>
     {% if tasks.has_next %}<a href="?page={{ tasks.next_page_number }}{% if completed_filter %}&completed={{ completed_filter }}{% endif %}">Next</a>{% endif %}

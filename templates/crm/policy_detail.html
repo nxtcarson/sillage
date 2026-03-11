@@ -7,7 +7,7 @@
     <p class="text-slate-500">{{ policy.carrier }} · {{ policy.get_type_display }}</p>
     <span class="inline-block mt-2 px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ policy.status }}</span>
   </div>
-  <a href="{% url 'policy_edit' policy.pk %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100">Edit</a>
+  <a href="{% url 'policy_edit' policy.pk %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Edit</a>
 </div>
 <div class="grid md:grid-cols-2 gap-6">
   <div>

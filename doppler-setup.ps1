@@ -28,4 +28,18 @@ if (Test-Path .env) {
     }
 }
 
+if (Test-Path firebase-service-account.json) {
+    Write-Host "`nFound firebase-service-account.json. Upload Firebase Admin credentials to Doppler? (y/n): " -NoNewline
+    $upload = Read-Host
+    if ($upload -eq 'y' -or $upload -eq 'Y') {
+        Write-Host "Uploading Firebase credentials to Doppler..." -ForegroundColor Green
+        python scripts/upload_firebase_to_doppler.py
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Upload complete." -ForegroundColor Green
+        } else {
+            Write-Host "Upload failed." -ForegroundColor Yellow
+        }
+    }
+}
+
 Write-Host "`nDone. Run .\run.ps1 to start the server." -ForegroundColor Green

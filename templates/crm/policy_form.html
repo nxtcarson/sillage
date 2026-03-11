@@ -6,7 +6,7 @@
   {{ form.as_p }}
   <div class="flex gap-2">
     <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Save</button>
-    <a href="{% if policy %}{% url 'policy_detail' policy.pk %}{% else %}{% url 'policy_list' %}{% endif %}" class="px-4 py-2 border rounded-lg">Cancel</a>
+    <a href="{% if policy %}{% url 'policy_detail' policy.pk %}{% else %}{% url 'policy_list' %}{% endif %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Cancel</a>
   </div>
 </form>
 {% endblock %}

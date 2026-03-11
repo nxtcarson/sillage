@@ -17,11 +17,13 @@
           <label class="block text-sm font-medium mb-1">Password</label>
           <input type="password" id="password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700" placeholder="Min 6 characters">
         </div>
+        <p id="auth-loading" class="text-slate-600 dark:text-slate-400 text-sm hidden"></p>
         <p id="auth-error" class="text-red-500 text-sm hidden"></p>
         <p id="magic-link-sent" class="text-green-600 text-sm hidden">Check your email for a sign-in link.</p>
         <button type="button" id="btn-signup" class="w-full py-2 px-4 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Create account</button>
         <button type="button" id="btn-magic" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Send magic link</button>
         <button type="button" id="btn-google" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Continue with Google</button>
+        <button type="button" id="btn-google-redirect" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-sm hidden" data-fallback>Continue with Google (redirect)</button>
       </div>
     </div>
     <p class="mt-4 text-sm text-slate-500">
@@ -60,25 +62,54 @@
   const errEl = document.getElementById('auth-error');
   const showErr = (msg) => { errEl.textContent = msg; errEl.classList.remove('hidden'); };
   const hideErr = () => { errEl.textContent = ''; errEl.classList.add('hidden'); };
+  const loadingEl = document.getElementById('auth-loading');
+  const setLoading = (msg) => {
+    if (loadingEl) {
+      if (msg) { loadingEl.textContent = msg; loadingEl.classList.remove('hidden'); }
+      else { loadingEl.textContent = ''; loadingEl.classList.add('hidden'); }
+    }
+  };
   const doLogin = async (token) => {
+    setLoading('Signing you in…');
+    hideErr();
     const form = new FormData();
     form.append('id_token', token);
     form.append('csrfmiddlewaretoken', csrfToken);
     const r = await fetch(loginUrl, { method: 'POST', body: form, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-    const data = await r.json();
+    let data;
+    try { data = await r.json(); } catch (_) { setLoading(''); showErr('Server error'); return; }
     if (data.ok) window.location = data.redirect;
-    else showErr(data.error || 'Signup failed');
+    else {
+      setLoading('');
+      showErr(data.error || 'Signup failed');
+      if (data.error && (data.error.includes('Firebase Admin') || data.error.includes('not configured'))) {
+        errEl.classList.add('font-semibold', 'bg-red-50', 'dark:bg-red-900/20', 'p-3', 'rounded');
+      }
+    }
   };
   document.getElementById('btn-signup').onclick = async () => {
     hideErr();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const name = document.getElementById('name').value.trim();
+    if (!email || !password) { showErr('Enter email and password'); return; }
     try {
-      const cred = await auth.createUserWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value);
-      if (cred.user) {
-        await cred.user.updateProfile({ displayName: document.getElementById('name').value });
+      let cred;
+      try {
+        cred = await auth.signInWithEmailAndPassword(email, password);
+      } catch (e) {
+        if (e.code === 'auth/user-not-found') {
+          cred = await auth.createUserWithEmailAndPassword(email, password);
+          if (cred.user && name) await cred.user.updateProfile({ displayName: name });
+        } else throw e;
       }
       const token = await cred.user.getIdToken();
       await doLogin(token);
-    } catch (e) { showErr(e.message || 'Signup failed'); }
+    } catch (e) {
+      if (e.code === 'auth/wrong-password') showErr('Wrong password. Try logging in instead.');
+      else if (e.code === 'auth/email-already-in-use') showErr('This email is already registered. Try logging in.');
+      else showErr(e.message || 'Signup failed');
+    }
   };
   document.getElementById('btn-magic').onclick = async () => {
     hideErr();
@@ -93,15 +124,44 @@
       document.getElementById('magic-link-sent').classList.remove('hidden');
     } catch (e) { showErr(e.message || 'Failed to send link'); }
   };
-  document.getElementById('btn-google').onclick = async () => {
+  const isLocalhost = /^localhost$|^127\.0\.0\.1$/.test(window.location.hostname);
+  const doGoogleSignIn = async (useRedirect) => {
     hideErr();
+    const provider = new firebase.auth.GoogleAuthProvider();
     try {
-      const provider = new firebase.auth.GoogleAuthProvider();
+      if (useRedirect || isLocalhost) {
+        await auth.signInWithRedirect(provider);
+        return;
+      }
       const cred = await auth.signInWithPopup(provider);
       const token = await cred.user.getIdToken();
       await doLogin(token);
-    } catch (e) { showErr(e.message || 'Signup failed'); }
+    } catch (e) {
+      if (e.code === 'auth/popup-closed-by-user') {
+        showErr('Popup closed. Try "Continue with Google (redirect)" below, or check browser privacy settings.');
+      } else {
+        showErr(e.message || 'Signup failed');
+      }
+    }
   };
+  const fallbackBtn = document.getElementById('btn-google-redirect');
+  if (!isLocalhost) fallbackBtn.classList.remove('hidden');
+  document.getElementById('btn-google').onclick = () => doGoogleSignIn(isLocalhost);
+  fallbackBtn.onclick = () => doGoogleSignIn(true);
+
+  const hasRedirectParams = !!(window.location.search || window.location.hash);
+  if (hasRedirectParams) setLoading('Completing sign-in…');
+  auth.getRedirectResult().then(async (result) => {
+    if (result.user) {
+      const token = await result.user.getIdToken();
+      await doLogin(token);
+    } else {
+      setLoading('');
+    }
+  }).catch((e) => {
+    setLoading('');
+    if (e.code !== 'auth/popup-closed-by-user') showErr(e.message);
+  });
 })();
 </script>
 {% endblock %}

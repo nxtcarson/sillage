@@ -1,7 +1,7 @@
 <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
   <td class="px-4 py-3"><a href="{% url 'contact_detail' contact.pk %}" class="text-brand-600 font-medium">{{ contact.full_name }}</a></td>
   <td class="px-4 py-3">{{ contact.email }}</td>
-  <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full bg-slate-200">{{ contact.status }}</span></td>
+  <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ contact.status }}</span></td>
   <td class="px-4 py-3">{{ contact.assigned_agent.name|default:"-" }}</td>
   <td class="px-4 py-3 text-right"><a href="{% url 'contact_edit' contact.pk %}" class="text-brand-600 text-sm">Edit</a></td>
 </tr>

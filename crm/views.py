@@ -9,7 +9,8 @@ from .forms import ContactForm, LeadForm, PolicyForm, TaskForm, ActivityForm
 
 
 def _get_org(request):
-    return getattr(request, "user_profile", None) and request.user_profile.organization
+    from core.org import get_current_org
+    return get_current_org(request)
 
 
 @require_auth

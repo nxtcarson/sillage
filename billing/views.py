@@ -1,18 +1,42 @@
+import logging
 import os
+from datetime import datetime, timezone
 import stripe
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from django.contrib import messages
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from core.decorators import require_auth
 from .models import Plan, Subscription
 
+logger = logging.getLogger(__name__)
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
 
 
 def _get_org(request):
-    return getattr(request, "user_profile", None) and request.user_profile.organization
+    from core.org import get_current_org
+    return get_current_org(request)
+
+
+def _is_valid_stripe_price(price_id):
+    if not price_id or not isinstance(price_id, str):
+        return False
+    p = price_id.strip()
+    return p.startswith("price_") and p != "price_xxx" and len(p) > 10
+
+
+def _sync_stripe_price_ids():
+    tier_to_env = {
+        "basic": "STRIPE_PRICE_BASIC",
+        "standard": "STRIPE_PRICE_STANDARD",
+        "pro": "STRIPE_PRICE_PRO",
+    }
+    for tier, env_key in tier_to_env.items():
+        price_id = os.environ.get(env_key, "").strip()
+        if _is_valid_stripe_price(price_id):
+            Plan.objects.filter(tier=tier).update(stripe_price_id=price_id)
 
 
 @require_http_methods(["GET"])
@@ -27,7 +51,10 @@ def pricing(request):
         ]:
             Plan.objects.get_or_create(tier=t, defaults={"name": n, "price": p, "features": f})
         plans = list(Plan.objects.all().order_by("price"))
-    return render(request, "billing/pricing.html", {"plans": plans})
+    _sync_stripe_price_ids()
+    plans = list(Plan.objects.all().order_by("price"))
+    stripe_configured = any(_is_valid_stripe_price(p.stripe_price_id) for p in plans if p.price > 0)
+    return render(request, "billing/pricing.html", {"plans": plans, "stripe_configured": stripe_configured})
 
 
 @require_auth
@@ -42,7 +69,7 @@ def checkout_create(request):
         org.save()
         return redirect("dashboard")
     plan = Plan.objects.filter(tier=tier).first()
-    if not plan or (plan.price > 0 and not plan.stripe_price_id):
+    if not plan or (plan.price > 0 and not _is_valid_stripe_price(plan.stripe_price_id)):
         return redirect("pricing")
     try:
         customer_id = None
@@ -62,6 +89,8 @@ def checkout_create(request):
         )
         return redirect(session.url)
     except Exception as e:
+        logger.exception("Stripe checkout failed for org=%s tier=%s", org.id if org else None, tier)
+        messages.warning(request, "Checkout failed. Add STRIPE_PRICE_BASIC, STRIPE_PRICE_STANDARD, STRIPE_PRICE_PRO to Doppler with real Stripe price IDs (see .env.example).")
         return redirect("pricing")
 
 
@@ -88,8 +117,8 @@ def checkout_success(request):
                         "status": "active",
                     },
                 )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Stripe checkout_success failed for session_id=%s: %s", session_id, e)
     return redirect("dashboard")
 
 
@@ -117,14 +146,13 @@ def customer_portal(request):
 def webhook(request):
     payload = request.body
     sig = request.headers.get("Stripe-Signature", "")
-    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+    if not webhook_secret:
+        return HttpResponse(status=400)
     try:
-        if webhook_secret:
-            event = stripe.Webhook.construct_event(payload, sig, webhook_secret)
-        else:
-            import json
-            event = json.loads(payload)
-    except Exception:
+        event = stripe.Webhook.construct_event(payload, sig, webhook_secret)
+    except Exception as e:
+        logger.warning("Stripe webhook signature verification failed: %s", e)
         return HttpResponse(status=400)
     if event.get("type") == "checkout.session.completed":
         session = event["data"]["object"]
@@ -155,7 +183,15 @@ def webhook(request):
         try:
             sub = Subscription.objects.get(stripe_subscription_id=sub_obj["id"])
             sub.status = sub_obj.get("status", "active")
-            sub.current_period_end = sub_obj.get("current_period_end")
+            ts = sub_obj.get("current_period_end")
+            sub.current_period_end = datetime.fromtimestamp(ts, tz=timezone.utc) if ts is not None else None
+            items = sub_obj.get("items", {}).get("data", [])
+            if items:
+                price_id = items[0].get("price", {}).get("id")
+                if price_id:
+                    plan = Plan.objects.filter(stripe_price_id=price_id).first()
+                    if plan:
+                        sub.plan = plan
             sub.save()
             if sub.organization and sub.plan:
                 sub.organization.tier = sub.plan.tier

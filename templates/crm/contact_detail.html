@@ -43,13 +43,13 @@
   <h3 class="font-semibold mb-2">Activity</h3>
   <form method="post" action="{% url 'activity_create' contact.pk %}" class="mb-4 flex gap-2">
     {% csrf_token %}
-    <select name="type" class="px-3 py-2 border rounded-lg">
+    <select name="type" class="px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
       <option value="note">Note</option>
       <option value="call">Call</option>
       <option value="email">Email</option>
       <option value="meeting">Meeting</option>
     </select>
-    <input type="text" name="description" placeholder="Add activity..." class="flex-1 px-3 py-2 border rounded-lg" required>
+    <input type="text" name="description" placeholder="Add activity..." class="flex-1 px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100" required>
     <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Add</button>
   </form>
   <div class="space-y-2">

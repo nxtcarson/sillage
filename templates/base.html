@@ -4,6 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function(){
+      var t=localStorage.getItem('theme');
+      if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches))
+        document.documentElement.classList.add('dark');
+      else if(t==='light') document.documentElement.classList.remove('dark');
+    })();
+  </script>
   <title>{% block title %}Sillage{% endblock %}</title>
   <link rel="icon" href="{% static 'img/sillage-logo.svg' %}" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,8 +56,21 @@
           <h1 class="text-lg font-semibold">{% block page_title %}Dashboard{% endblock %}</h1>
         </div>
         <div class="flex items-center gap-4">
+          {% if user_organizations|length > 1 %}
+          <form method="post" action="{% url 'switch_org' %}" class="flex items-center gap-2">
+            {% csrf_token %}
+            <select name="org_id" onchange="this.form.submit()" class="text-sm px-2 py-1 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+              {% for o in user_organizations %}
+              <option value="{{ o.id }}" {% if current_org and current_org.id == o.id %}selected{% endif %}>{{ o.name }}</option>
+              {% endfor %}
+            </select>
+          </form>
+          {% elif current_org %}
+          <span class="text-sm text-slate-500">{{ current_org.name }}</span>
+          {% endif %}
+          <a href="{% url 'create_org' %}" class="text-sm text-brand-600 hover:underline">+ Add company</a>
           <span class="text-sm text-slate-500">{{ user_profile.name|default:user_profile.email }}</span>
-          <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="text-sm px-3 py-1 rounded border border-slate-300 dark:border-slate-600">Toggle dark</button>
+          <button type="button" onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')" class="text-sm px-3 py-1 rounded border border-slate-300 dark:border-slate-600">Toggle dark</button>
         </div>
       </header>
       <div class="p-4 md:p-6">

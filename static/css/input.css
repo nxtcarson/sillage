@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  input, select, textarea {
+    @apply rounded border border-slate-300 bg-white text-slate-900;
+    @apply dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100;
+  }
+}
+
 .htmx-request .htmx-indicator {
   display: inline-block;
 }

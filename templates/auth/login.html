@@ -13,11 +13,13 @@
           <label class="block text-sm font-medium mb-1">Password</label>
           <input type="password" id="password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700">
         </div>
+        <p id="auth-loading" class="text-slate-600 dark:text-slate-400 text-sm hidden"></p>
         <p id="auth-error" class="text-red-500 text-sm hidden"></p>
         <p id="magic-link-sent" class="text-green-600 text-sm hidden">Check your email for a sign-in link.</p>
         <button type="button" id="btn-login" class="w-full py-2 px-4 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Log in</button>
         <button type="button" id="btn-magic" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Send magic link</button>
         <button type="button" id="btn-google" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Continue with Google</button>
+        <button type="button" id="btn-google-redirect" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-sm hidden" data-fallback>Continue with Google (redirect)</button>
       </div>
     </div>
     <p class="mt-4 text-sm text-slate-500">
@@ -56,14 +58,29 @@
   const errEl = document.getElementById('auth-error');
   const showErr = (msg) => { errEl.textContent = msg; errEl.classList.remove('hidden'); };
   const hideErr = () => { errEl.textContent = ''; errEl.classList.add('hidden'); };
+  const loadingEl = document.getElementById('auth-loading');
+  const setLoading = (msg) => {
+    if (msg) { loadingEl.textContent = msg; loadingEl.classList.remove('hidden'); }
+    else { loadingEl.textContent = ''; loadingEl.classList.add('hidden'); }
+  };
   const doLogin = async (token) => {
+    setLoading('Signing you in…');
+    hideErr();
     const form = new FormData();
     form.append('id_token', token);
     form.append('csrfmiddlewaretoken', csrfToken);
     const r = await fetch(loginUrl, { method: 'POST', body: form, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-    const data = await r.json();
+    let data;
+    try { data = await r.json(); } catch (_) { setLoading(''); showErr('Server error'); return; }
     if (data.ok) window.location = data.redirect;
-    else showErr(data.error || 'Login failed');
+    else {
+      setLoading('');
+      const msg = data.error || 'Login failed';
+      showErr(msg);
+      if (msg.includes('Firebase Admin') || msg.includes('not configured')) {
+        errEl.classList.add('font-semibold', 'bg-red-50', 'dark:bg-red-900/20', 'p-3', 'rounded');
+      }
+    }
   };
   document.getElementById('btn-login').onclick = async () => {
     hideErr();
@@ -84,15 +101,48 @@
       document.getElementById('magic-link-sent').classList.remove('hidden');
     } catch (e) { showErr(e.message || 'Failed to send link'); }
   };
-  document.getElementById('btn-google').onclick = async () => {
+  const isLocalhost = /^localhost$|^127\.0\.0\.1$/.test(window.location.hostname);
+  const doGoogleSignIn = async (useRedirect) => {
     hideErr();
+    const provider = new firebase.auth.GoogleAuthProvider();
     try {
-      const provider = new firebase.auth.GoogleAuthProvider();
+      if (useRedirect || isLocalhost) {
+        await auth.signInWithRedirect(provider);
+        return;
+      }
       const cred = await auth.signInWithPopup(provider);
       const token = await cred.user.getIdToken();
       await doLogin(token);
-    } catch (e) { showErr(e.message || 'Login failed'); }
+    } catch (e) {
+      if (e.code === 'auth/popup-closed-by-user') {
+        showErr('Popup closed. Try "Continue with Google (redirect)" below, or check browser privacy settings.');
+      } else {
+        showErr(e.message || 'Login failed');
+      }
+    }
   };
+  const fallbackBtn = document.getElementById('btn-google-redirect');
+  if (!isLocalhost) fallbackBtn.classList.remove('hidden');
+  document.getElementById('btn-google').onclick = () => doGoogleSignIn(isLocalhost);
+  fallbackBtn.onclick = () => doGoogleSignIn(true);
+
+  const hasRedirectParams = !!(window.location.search || window.location.hash);
+  if (hasRedirectParams) setLoading('Completing sign-in…');
+  auth.getRedirectResult().then(async (result) => {
+    if (result.user) {
+      const token = await result.user.getIdToken();
+      await doLogin(token);
+    } else {
+      setLoading('');
+      if (hasRedirectParams) {
+        showErr('Sign-in could not be completed. If the backend needs the Firebase service account, add it to Doppler (see DOPPLER_SETUP.md). Otherwise try again.');
+        errEl.classList.add('font-semibold', 'bg-amber-50', 'dark:bg-amber-900/20', 'p-3', 'rounded');
+      }
+    }
+  }).catch((e) => {
+    setLoading('');
+    if (e.code !== 'auth/popup-closed-by-user') showErr(e.message);
+  });
 })();
 </script>
 {% endblock %}

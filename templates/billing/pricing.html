@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block page_title %}Pricing{% endblock %}
 {% block content %}
+{% if not stripe_configured and user_profile %}
+<div class="max-w-2xl mx-auto mb-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-sm">
+  <strong>Stripe not configured.</strong> Create products in <a href="https://dashboard.stripe.com/products" class="underline" target="_blank" rel="noopener">Stripe Dashboard</a>, copy each price ID, and add STRIPE_PRICE_BASIC, STRIPE_PRICE_STANDARD, STRIPE_PRICE_PRO to Doppler. Until then, paid plans will not work.
+</div>
+{% endif %}
+{% if messages %}
+<div class="max-w-2xl mx-auto mb-6 space-y-2">
+  {% for m in messages %}
+  <div class="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-sm">{{ m }}</div>
+  {% endfor %}
+</div>
+{% endif %}
 <div class="text-center mb-12">
   <h1 class="text-3xl font-bold mb-2">Choose your plan</h1>
   <p class="text-slate-500">Manage your insurance pipeline with the right tools</p>

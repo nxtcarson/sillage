@@ -8,4 +8,6 @@ urlpatterns = [
     path("auth/signup/", views.firebase_signup, name="firebase_signup"),
     path("auth/finish-sign-in/", views.finish_sign_in_page, name="finish_sign_in"),
     path("auth/logout/", views.logout_view, name="logout"),
+    path("auth/switch-org/", views.switch_org, name="switch_org"),
+    path("settings/companies/", views.create_org_page, name="create_org"),
 ]
