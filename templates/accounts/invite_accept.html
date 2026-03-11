@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block page_title %}Invitation{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto text-center">
+  {% if expired %}
+  <div class="p-6 rounded-lg bg-slate-100 dark:bg-slate-800">
+    <h2 class="text-xl font-semibold mb-2">This invite has expired</h2>
+    <p class="text-slate-500 mb-4">Invitation links are valid for 7 days. Ask your teammate to send a new one.</p>
+    {% if user_profile %}<a href="{% url 'dashboard' %}" class="text-brand-600 hover:underline">Go to dashboard</a>{% else %}<a href="{% url 'login' %}" class="text-brand-600 hover:underline">Go to login</a>{% endif %}
+  </div>
+  {% else %}
+  <div class="p-6 rounded-lg bg-white dark:bg-slate-800 shadow">
+    <h2 class="text-xl font-semibold mb-2">You're invited</h2>
+    <p class="text-slate-600 dark:text-slate-400 mb-4">Join <strong>{{ invitation.organization.name }}</strong> as <strong>{{ invitation.get_role_display }}</strong>.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="flex gap-2 justify-center">
+        <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Accept</button>
+        <a href="{% url 'dashboard' %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Decline</a>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

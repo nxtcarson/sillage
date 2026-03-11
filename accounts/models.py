@@ -17,6 +17,14 @@ class Organization(models.Model):
         return self.name
 
 
+ROLE_CHOICES = [
+    ("owner", "Owner"),
+    ("admin", "Admin"),
+    ("agent", "Agent"),
+    ("viewer", "Viewer"),
+]
+
+
 class OrganizationMembership(models.Model):
     ROLE_CHOICES = [
         ("owner", "Owner"),
@@ -31,6 +39,22 @@ class OrganizationMembership(models.Model):
 
     class Meta:
         unique_together = [("user", "organization")]
+
+
+class Invitation(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="invitations")
+    email = models.EmailField(blank=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="agent")
+    token = models.CharField(max_length=64, unique=True)
+    invited_by = models.ForeignKey("UserProfile", on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def is_valid(self):
+        from django.utils import timezone
+        return self.accepted_at is None and timezone.now() < self.expires_at
 
 
 class UserProfile(models.Model):

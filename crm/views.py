@@ -1,3 +1,6 @@
+import csv
+from io import StringIO
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.core.paginator import Paginator
@@ -48,6 +51,68 @@ def dashboard(request):
         "upcoming_tasks": upcoming_tasks,
         "renewals": renewals,
     })
+
+
+@require_auth
+def global_search(request):
+    org = _get_org(request)
+    if not org:
+        return redirect("login")
+    q = request.GET.get("q", "").strip()
+    contacts = []
+    policies = []
+    tasks = []
+    if q:
+        contacts = Contact.objects.filter(organization=org).filter(
+            Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q)
+        )[:10]
+        policies = Policy.objects.filter(organization=org).filter(
+            Q(policy_number__icontains=q) | Q(contact__first_name__icontains=q) | Q(contact__last_name__icontains=q)
+        ).select_related("contact")[:10]
+        tasks = Task.objects.filter(organization=org).filter(
+            Q(title__icontains=q) | Q(description__icontains=q)
+        ).select_related("related_contact")[:10]
+    return render(request, "crm/search_results.html", {"q": q, "contacts": contacts, "policies": policies, "tasks": tasks})
+
+
+@require_auth
+def contacts_export(request):
+    org = _get_org(request)
+    if not org:
+        return redirect("login")
+    buffer = StringIO()
+    w = csv.writer(buffer)
+    w.writerow(["First Name", "Last Name", "Email", "Phone", "Status", "Source"])
+    for c in Contact.objects.filter(organization=org).order_by("last_name", "first_name"):
+        w.writerow([c.first_name, c.last_name, c.email or "", c.phone or "", c.status, c.source or ""])
+    resp = HttpResponse(buffer.getvalue(), content_type="text/csv")
+    resp["Content-Disposition"] = 'attachment; filename="contacts.csv"'
+    return resp
+
+
+@require_auth
+def policies_export(request):
+    org = _get_org(request)
+    if not org:
+        return redirect("login")
+    buffer = StringIO()
+    w = csv.writer(buffer)
+    w.writerow(["Policy Number", "Contact", "Carrier", "Type", "Premium", "Commission", "Status", "Effective", "Expiry"])
+    for p in Policy.objects.filter(organization=org).select_related("contact").order_by("-created_at"):
+        w.writerow([
+            p.policy_number or "",
+            p.contact.full_name,
+            p.carrier,
+            p.type,
+            p.premium,
+            p.commission,
+            p.status,
+            p.effective_date or "",
+            p.expiry_date or "",
+        ])
+    resp = HttpResponse(buffer.getvalue(), content_type="text/csv")
+    resp["Content-Disposition"] = 'attachment; filename="policies.csv"'
+    return resp
 
 
 @require_auth

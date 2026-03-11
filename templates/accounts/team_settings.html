@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block page_title %}Team{% endblock %}
+{% block content %}
+<div class="max-w-3xl space-y-8">
+  {% if new_invite_url %}
+  <div class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+    <p class="font-medium text-green-800 dark:text-green-200 mb-2">Invite link created. Share it with your teammate:</p>
+    <div class="flex gap-2">
+      <input type="text" readonly value="{{ new_invite_url }}" id="invite-url" class="flex-1 px-3 py-2 border rounded-lg bg-white dark:bg-slate-700 text-sm">
+      <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('invite-url').value); this.textContent='Copied!'" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm">Copy</button>
+    </div>
+    <p class="text-xs text-slate-500 mt-2">Link expires in 7 days.</p>
+  </div>
+  {% endif %}
+
+  <div>
+    <h2 class="text-lg font-semibold mb-4">Members</h2>
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+      <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+        <thead class="bg-slate-50 dark:bg-slate-700">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium">Name</th>
+            <th class="px-4 py-3 text-left text-sm font-medium">Email</th>
+            <th class="px-4 py-3 text-left text-sm font-medium">Role</th>
+            <th class="px-4 py-3 text-right text-sm font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+          {% for m in memberships %}
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+            <td class="px-4 py-3">{{ m.user.name|default:m.user.email }}</td>
+            <td class="px-4 py-3">{{ m.user.email }}</td>
+            <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ m.get_role_display }}</span></td>
+            <td class="px-4 py-3 text-right">
+              {% if m.user_id == user_profile.id %}
+              <span class="text-slate-500 text-sm">(you)</span>
+              {% else %}
+              {% if m.role != 'owner' and user_membership and user_membership.role in 'owner,admin' %}
+              <form method="post" action="{% url 'member_change_role' m.id %}" class="inline">
+                {% csrf_token %}
+                <select name="role" onchange="this.form.submit()" class="text-sm px-2 py-1 rounded border dark:bg-slate-700 dark:border-slate-600">
+                  <option value="admin" {% if m.role == 'admin' %}selected{% endif %}>Admin</option>
+                  <option value="agent" {% if m.role == 'agent' %}selected{% endif %}>Agent</option>
+                  <option value="viewer" {% if m.role == 'viewer' %}selected{% endif %}>Viewer</option>
+                </select>
+              </form>
+              {% endif %}
+              {% if user_membership and user_membership.role == 'owner' %}
+              <form method="post" action="{% url 'member_remove' m.id %}" class="inline ml-2" onsubmit="return confirm('Remove this member?');">
+                {% csrf_token %}
+                <button type="submit" class="text-red-600 hover:underline text-sm">Remove</button>
+              </form>
+              {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">No members yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="text-lg font-semibold mb-4">Pending invites</h2>
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+      <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+        <thead class="bg-slate-50 dark:bg-slate-700">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium">Role</th>
+            <th class="px-4 py-3 text-left text-sm font-medium">Invited by</th>
+            <th class="px-4 py-3 text-left text-sm font-medium">Expires</th>
+            <th class="px-4 py-3 text-right text-sm font-medium">Link</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+          {% for inv in pending_invites %}
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+            <td class="px-4 py-3">{{ inv.get_role_display }}</td>
+            <td class="px-4 py-3">{{ inv.invited_by.name|default:inv.invited_by.email }}</td>
+            <td class="px-4 py-3 text-sm">{{ inv.expires_at|date:"M d, Y" }}</td>
+            <td class="px-4 py-3 text-right">
+              <button type="button" onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}/invite/{{ inv.token }}/'); this.textContent='Copied!'" class="text-brand-600 hover:underline text-sm">Copy link</button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">No pending invites.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="text-lg font-semibold mb-4">Create invite</h2>
+    <form method="post" action="{% url 'invite_create' %}" class="flex flex-wrap gap-4 items-end">
+      {% csrf_token %}
+      <div>
+        <label for="email" class="block text-sm font-medium mb-1">Email (optional)</label>
+        <input type="email" id="email" name="email" placeholder="teammate@example.com" class="px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600">
+      </div>
+      <div>
+        <label for="role" class="block text-sm font-medium mb-1">Role</label>
+        <select name="role" id="role" class="px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600">
+          <option value="agent">Agent</option>
+          <option value="admin">Admin</option>
+          <option value="viewer">Viewer</option>
+        </select>
+      </div>
+      <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Generate invite link</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

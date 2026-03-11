@@ -1,12 +1,17 @@
 import logging
 import re
+import secrets
 import uuid
-from django.shortcuts import render, redirect
+from datetime import timedelta
+
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.http import require_POST, require_http_methods
 from core.decorators import require_auth
 from core.firebase import get_firebase_app, verify_id_token
-from .models import UserProfile, Organization, OrganizationMembership
+from core.org import get_current_org
+from .models import UserProfile, Organization, OrganizationMembership, Invitation
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +74,9 @@ def firebase_login(request):
         request.session["user_id"] = profile.id
         request.session["org_id"] = org.id if org else None
         request.session["org_tier"] = org.tier if org else "free"
-        return JsonResponse({"ok": True, "redirect": "/dashboard/"})
+        pending = request.session.get("pending_invite_token")
+        redirect_url = f"/invite/{pending}/" if pending else "/dashboard/"
+        return JsonResponse({"ok": True, "redirect": redirect_url})
     except Exception as e:
         logger.exception("Firebase login unexpected error")
         return JsonResponse({"ok": False, "error": str(e)}, status=500)
@@ -121,3 +128,135 @@ def create_org_page(request):
         request.session["org_tier"] = org.tier
         return redirect("dashboard")
     return render(request, "accounts/create_org.html")
+
+
+@require_auth
+def team_settings(request):
+    org = get_current_org(request)
+    if not org:
+        return redirect("dashboard")
+    memberships = OrganizationMembership.objects.filter(organization=org).select_related("user").order_by("-role")
+    pending = Invitation.objects.filter(organization=org, accepted_at__isnull=True, expires_at__gt=timezone.now()).select_related("invited_by").order_by("-created_at")
+    user_membership = OrganizationMembership.objects.filter(user=request.user_profile, organization=org).first()
+    return render(request, "accounts/team_settings.html", {"memberships": memberships, "pending_invites": pending, "user_membership": user_membership})
+
+
+@require_auth
+@require_POST
+def invite_create(request):
+    org = get_current_org(request)
+    if not org:
+        return redirect("dashboard")
+    role = request.POST.get("role", "agent")
+    if role not in ("owner", "admin", "agent", "viewer"):
+        role = "agent"
+    token = secrets.token_urlsafe(32)
+    expires_at = timezone.now() + timedelta(days=7)
+    inv = Invitation.objects.create(
+        organization=org,
+        email=request.POST.get("email", "").strip(),
+        role=role,
+        token=token,
+        invited_by=request.user_profile,
+        expires_at=expires_at,
+    )
+    invite_url = request.build_absolute_uri(f"/invite/{token}/")
+    user_membership = OrganizationMembership.objects.filter(user=request.user_profile, organization=org).first()
+    return render(request, "accounts/team_settings.html", {
+        "memberships": OrganizationMembership.objects.filter(organization=org).select_related("user").order_by("-role"),
+        "pending_invites": Invitation.objects.filter(organization=org, accepted_at__isnull=True, expires_at__gt=timezone.now()).select_related("invited_by").order_by("-created_at"),
+        "user_membership": user_membership,
+        "new_invite_url": invite_url,
+    })
+
+
+@require_http_methods(["GET", "POST"])
+def invite_accept(request, token):
+    inv = get_object_or_404(Invitation, token=token)
+    if not inv.is_valid:
+        return render(request, "accounts/invite_accept.html", {"invitation": inv, "expired": True})
+    if not request.session.get("user_id"):
+        request.session["pending_invite_token"] = token
+        return redirect(f"/login/?next=/invite/{token}/")
+    profile = UserProfile.objects.get(id=request.session["user_id"])
+    if request.method == "POST":
+        OrganizationMembership.objects.get_or_create(
+            user=profile,
+            organization=inv.organization,
+            defaults={"role": inv.role, "is_primary": False},
+        )
+        inv.accepted_at = timezone.now()
+        inv.save(update_fields=["accepted_at"])
+        request.session.pop("pending_invite_token", None)
+        request.session["org_id"] = inv.organization_id
+        request.session["org_tier"] = inv.organization.tier
+        return redirect("dashboard")
+    return render(request, "accounts/invite_accept.html", {"invitation": inv, "expired": False})
+
+
+@require_http_methods(["GET", "POST"])
+@require_auth
+def profile_settings(request):
+    profile = request.user_profile
+    if request.method == "POST":
+        name = (request.POST.get("name") or "").strip()
+        profile.name = name
+        avatar = (request.POST.get("avatar_url") or "").strip()
+        if avatar:
+            profile.avatar_url = avatar
+        profile.save()
+        return redirect("profile_settings")
+    return render(request, "accounts/profile_settings.html")
+
+
+@require_http_methods(["GET", "POST"])
+@require_auth
+def org_settings(request):
+    org = get_current_org(request)
+    if not org:
+        return redirect("dashboard")
+    membership = OrganizationMembership.objects.filter(user=request.user_profile, organization=org).first()
+    if not membership or membership.role not in ("owner", "admin"):
+        return redirect("dashboard")
+    if request.method == "POST":
+        name = (request.POST.get("name") or "").strip()
+        if name:
+            org.name = name
+            org.save()
+        return redirect("org_settings")
+    return render(request, "accounts/org_settings.html", {"org": org})
+
+
+@require_auth
+@require_POST
+def member_change_role(request, membership_id):
+    org = get_current_org(request)
+    if not org:
+        return redirect("dashboard")
+    membership = get_object_or_404(OrganizationMembership, id=membership_id, organization=org)
+    my_membership = OrganizationMembership.objects.filter(user=request.user_profile, organization=org).first()
+    if not my_membership or my_membership.role not in ("owner", "admin"):
+        return redirect("team_settings")
+    if membership.role == "owner":
+        return redirect("team_settings")
+    role = request.POST.get("role")
+    if role in ("admin", "agent", "viewer"):
+        membership.role = role
+        membership.save()
+    return redirect("team_settings")
+
+
+@require_auth
+@require_POST
+def member_remove(request, membership_id):
+    org = get_current_org(request)
+    if not org:
+        return redirect("dashboard")
+    membership = get_object_or_404(OrganizationMembership, id=membership_id, organization=org)
+    my_membership = OrganizationMembership.objects.filter(user=request.user_profile, organization=org).first()
+    if not my_membership or my_membership.role != "owner":
+        return redirect("team_settings")
+    if membership.user_id == request.user_profile.id:
+        return redirect("team_settings")
+    membership.delete()
+    return redirect("team_settings")

@@ -35,6 +35,29 @@ def require_tier(*tiers):
     return decorator
 
 
+def require_role(*roles):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if not request.session.get("user_id"):
+                if request.headers.get("HX-Request"):
+                    return HttpResponseForbidden("<p>Please log in.</p>")
+                return redirect(reverse("login"))
+            org = getattr(request, "current_org", None)
+            if not org:
+                return redirect(reverse("dashboard"))
+            from accounts.models import OrganizationMembership
+            m = OrganizationMembership.objects.filter(user=request.user_profile, organization=org).first()
+            role = m.role if m else "viewer"
+            if role.lower() not in [r.lower() for r in roles]:
+                if request.headers.get("HX-Request"):
+                    return HttpResponseForbidden("<p>You don't have permission for this action.</p>")
+                return HttpResponseForbidden("<p>You don't have permission for this action.</p>")
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
 def tier_has_feature(org_tier, feature):
     tier_level = TIER_ORDER.get((org_tier or "free").lower(), 0)
     feature_tiers = {

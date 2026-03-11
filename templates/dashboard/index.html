@@ -2,6 +2,17 @@
 {% block page_title %}Dashboard{% endblock %}
 {% block content %}
 <div class="space-y-6">
+  {% if contacts_count == 0 %}
+  <div class="p-6 rounded-lg bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800">
+    <h3 class="font-semibold text-brand-800 dark:text-brand-200 mb-2">Getting started</h3>
+    <p class="text-sm text-brand-700 dark:text-brand-300 mb-4">Add your first contact, invite a teammate, or set up billing to unlock more features.</p>
+    <div class="flex flex-wrap gap-4">
+      <a href="{% url 'contact_create' %}" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 text-sm">Add first contact</a>
+      <a href="{% url 'team_settings' %}" class="px-4 py-2 border border-brand-600 text-brand-600 dark:border-brand-400 dark:text-brand-400 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/30 text-sm">Invite teammate</a>
+      <a href="{% url 'pricing' %}" class="px-4 py-2 border border-brand-600 text-brand-600 dark:border-brand-400 dark:text-brand-400 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/30 text-sm">View plans</a>
+    </div>
+  </div>
+  {% endif %}
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
       <p class="text-sm text-slate-500">Contacts</p>

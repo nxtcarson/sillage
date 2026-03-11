@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 logger = logging.getLogger(__name__)
-PUBLIC_PATHS = ["/", "/login/", "/signup/", "/pricing/", "/auth/login/", "/auth/signup/", "/auth/finish-sign-in/", "/billing/webhook/"]
+PUBLIC_PATHS = ["/", "/login/", "/signup/", "/pricing/", "/auth/login/", "/auth/signup/", "/auth/finish-sign-in/", "/billing/webhook/", "/invite"]
 
 
 class PopupAuthMiddleware:

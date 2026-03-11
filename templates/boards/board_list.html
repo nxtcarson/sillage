@@ -13,9 +13,10 @@
     <p class="text-xs text-slate-400 mt-2">{{ board.columns.count }} columns</p>
   </a>
   {% empty %}
-  <div class="col-span-full text-center py-12 text-slate-500">
-    <p>No boards yet.</p>
-    <a href="{% url 'board_create' %}" class="text-brand-600 mt-2 inline-block">Create your first board</a>
+  <div class="col-span-full text-center py-16 px-4 bg-white dark:bg-slate-800 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700">
+    <p class="text-4xl mb-2">📋</p>
+    <p class="text-slate-500 mb-4">No boards yet. Create a Kanban board to organize deals and workflows.</p>
+    <a href="{% url 'board_create' %}" class="inline-block px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">New Board</a>
   </div>
   {% endfor %}
 </div>

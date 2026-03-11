@@ -5,6 +5,9 @@ from . import calendar_views
 
 urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("search/", views.global_search, name="global_search"),
+    path("contacts/export/", views.contacts_export, name="contacts_export"),
+    path("policies/export/", views.policies_export, name="policies_export"),
     path("contacts/", views.contact_list, name="contact_list"),
     path("contacts/create/", views.contact_create, name="contact_create"),
     path("contacts/<int:pk>/", views.contact_detail, name="contact_detail"),

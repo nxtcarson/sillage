@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block page_title %}Search{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <form method="get" action="{% url 'global_search' %}" class="flex gap-2">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search contacts, policies, tasks..." class="flex-1 px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600">
+    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Search</button>
+  </form>
+
+  {% if q %}
+  <div class="grid md:grid-cols-3 gap-6">
+    <div>
+      <h3 class="font-semibold mb-3">Contacts</h3>
+      <div class="space-y-2">
+        {% for c in contacts %}
+        <a href="{% url 'contact_detail' c.pk %}" class="block p-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700">{{ c.full_name }} — {{ c.email }}</a>
+        {% empty %}
+        <p class="text-slate-500 text-sm">No contacts found.</p>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold mb-3">Policies</h3>
+      <div class="space-y-2">
+        {% for p in policies %}
+        <a href="{% url 'policy_detail' p.pk %}" class="block p-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700">{{ p.policy_number|default:"Draft" }} — {{ p.contact.full_name }}</a>
+        {% empty %}
+        <p class="text-slate-500 text-sm">No policies found.</p>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold mb-3">Tasks</h3>
+      <div class="space-y-2">
+        {% for t in tasks %}
+        <a href="{% url 'task_edit' t.pk %}" class="block p-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700">{{ t.title }}{% if t.related_contact %} — {{ t.related_contact.full_name }}{% endif %}</a>
+        {% empty %}
+        <p class="text-slate-500 text-sm">No tasks found.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-slate-500">Enter a search term to find contacts, policies, and tasks.</p>
+  {% endif %}
+</div>
+{% endblock %}

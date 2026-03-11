@@ -12,7 +12,10 @@
     </select>
     <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Filter</button>
   </form>
-  <a href="{% url 'contact_create' %}" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Add Contact</a>
+  <div class="flex gap-2">
+    <a href="{% url 'contacts_export' %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Export CSV</a>
+    <a href="{% url 'contact_create' %}" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Add Contact</a>
+  </div>
 </div>
 <div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
   <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
@@ -39,7 +42,13 @@
         </td>
       </tr>
       {% empty %}
-      <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">No contacts yet. <a href="{% url 'contact_create' %}" class="text-brand-600">Add one</a></td></tr>
+      <tr><td colspan="5" class="px-4 py-12">
+        <div class="text-center">
+          <p class="text-4xl mb-2">👤</p>
+          <p class="text-slate-500 mb-4">No contacts yet. Add your first contact to start tracking leads and clients.</p>
+          <a href="{% url 'contact_create' %}" class="inline-block px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Add Contact</a>
+        </div>
+      </td></tr>
       {% endfor %}
     </tbody>
   </table>
