@@ -64,10 +64,10 @@ class UserProfile(models.Model):
         ("agent", "Agent"),
         ("viewer", "Viewer"),
     ]
-    firebase_uid = models.CharField(max_length=128, unique=True)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members", null=True, blank=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="agent")
-    email = models.EmailField()
+    email = models.EmailField(unique=True, db_index=True)
+    password = models.CharField(max_length=128)
     name = models.CharField(max_length=255, blank=True)
     avatar_url = models.URLField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

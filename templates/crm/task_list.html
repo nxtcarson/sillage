@@ -1,57 +1,83 @@
 {% extends "base.html" %}
 {% block page_title %}Tasks{% endblock %}
 {% block content %}
-<div class="flex justify-between items-center mb-6">
-  <form method="get" class="flex gap-2">
-    <select name="completed" class="px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100" onchange="this.form.submit()">
-      <option value="">All</option>
+<div class="page-header">
+  <form method="get" class="flex gap-2 items-center">
+    <select name="completed" class="py-2 px-3" onchange="this.form.submit()">
+      <option value="">All tasks</option>
       <option value="0" {% if completed_filter == '0' %}selected{% endif %}>Open</option>
       <option value="1" {% if completed_filter == '1' %}selected{% endif %}>Completed</option>
     </select>
   </form>
-  <a href="{% url 'task_create' %}" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Add Task</a>
+  <a href="{% url 'task_create' %}" class="btn-primary">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+    Add Task
+  </a>
 </div>
-<div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+
+<div class="card overflow-hidden">
   <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-    <thead class="bg-slate-50 dark:bg-slate-700">
+    <thead class="bg-slate-50 dark:bg-slate-700/50">
       <tr>
-        <th class="px-4 py-3 text-left text-sm font-medium">Task</th>
-        <th class="px-4 py-3 text-left text-sm font-medium">Contact</th>
-        <th class="px-4 py-3 text-left text-sm font-medium">Due</th>
-        <th class="px-4 py-3 text-left text-sm font-medium">Assigned</th>
-        <th class="px-4 py-3 text-right text-sm font-medium">Actions</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Task</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">Contact</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Due</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">Assigned</th>
+        <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
       {% for task in tasks %}
-      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 {% if task.completed %}opacity-60{% endif %}">
+      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors {% if task.completed %}opacity-60{% endif %}">
         <td class="px-4 py-3">
-          <form method="post" action="{% url 'task_toggle' task.pk %}" class="inline">{% csrf_token %}
-            <button type="submit" class="mr-2">{{ task.completed|yesno:"☑,☐" }}</button>
-          </form>
-          {{ task.title }}
+          <div class="flex items-center gap-3">
+            <form method="post" action="{% url 'task_toggle' task.pk %}" class="contents">
+              {% csrf_token %}
+              <button type="submit" class="shrink-0 cursor-pointer" aria-label="{% if task.completed %}Mark incomplete{% else %}Mark complete{% endif %}">
+                {% if task.completed %}
+                <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                {% else %}
+                <svg class="w-5 h-5 text-slate-300 dark:text-slate-600 hover:text-brand-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                {% endif %}
+              </button>
+            </form>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300 {% if task.completed %}line-through{% endif %}">{{ task.title }}</span>
+          </div>
         </td>
-        <td class="px-4 py-3">{% if task.related_contact %}<a href="{% url 'contact_detail' task.related_contact.pk %}">{{ task.related_contact.full_name }}</a>{% else %}-{% endif %}</td>
-        <td class="px-4 py-3">{{ task.due_date|default:"-" }}</td>
-        <td class="px-4 py-3">{{ task.assigned_to.name|default:"-" }}</td>
-        <td class="px-4 py-3 text-right"><a href="{% url 'task_edit' task.pk %}" class="text-brand-600 text-sm">Edit</a></td>
+        <td class="px-4 py-3 text-sm text-slate-500 hidden sm:table-cell">
+          {% if task.related_contact %}
+          <a href="{% url 'contact_detail' task.related_contact.pk %}" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors cursor-pointer">{{ task.related_contact.full_name }}</a>
+          {% else %}—{% endif %}
+        </td>
+        <td class="px-4 py-3 text-sm text-slate-500 hidden md:table-cell">{{ task.due_date|default:"—" }}</td>
+        <td class="px-4 py-3 text-sm text-slate-500 hidden lg:table-cell">{{ task.assigned_to.name|default:"—" }}</td>
+        <td class="px-4 py-3 text-right">
+          <a href="{% url 'task_edit' task.pk %}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline font-medium cursor-pointer">Edit</a>
+        </td>
       </tr>
       {% empty %}
-      <tr><td colspan="5" class="px-4 py-12">
-        <div class="text-center">
-          <p class="text-4xl mb-2">✓</p>
-          <p class="text-slate-500 mb-4">No tasks yet. Create a task to track follow-ups and to-dos.</p>
-          <a href="{% url 'task_create' %}" class="inline-block px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Add Task</a>
-        </div>
-      </td></tr>
+      <tr>
+        <td colspan="5" class="px-4">
+          <div class="empty-state">
+            <svg class="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+            <p class="empty-state-title">No tasks yet</p>
+            <p class="empty-state-desc">Create a task to track follow-ups and to-dos.</p>
+            <a href="{% url 'task_create' %}" class="btn-primary">Add Task</a>
+          </div>
+        </td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
   {% if tasks.has_other_pages %}
-  <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-between">
-    {% if tasks.has_previous %}<a href="?page={{ tasks.previous_page_number }}{% if completed_filter %}&completed={{ completed_filter }}{% endif %}">Previous</a>{% endif %}
-    <span>Page {{ tasks.number }} of {{ tasks.paginator.num_pages }}</span>
-    {% if tasks.has_next %}<a href="?page={{ tasks.next_page_number }}{% if completed_filter %}&completed={{ completed_filter }}{% endif %}">Next</a>{% endif %}
+  <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-sm">
+    {% if tasks.has_previous %}
+    <a href="?page={{ tasks.previous_page_number }}{% if completed_filter %}&completed={{ completed_filter }}{% endif %}" class="btn-secondary py-1.5 text-xs">Previous</a>
+    {% else %}<span></span>{% endif %}
+    <span class="text-slate-500">Page {{ tasks.number }} of {{ tasks.paginator.num_pages }}</span>
+    {% if tasks.has_next %}
+    <a href="?page={{ tasks.next_page_number }}{% if completed_filter %}&completed={{ completed_filter }}{% endif %}" class="btn-secondary py-1.5 text-xs">Next</a>
+    {% else %}<span></span>{% endif %}
   </div>
   {% endif %}
 </div>

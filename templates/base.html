@@ -1,4 +1,5 @@
 {% load static %}
+{% load tier_tags %}
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
@@ -24,62 +25,140 @@
 <body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans">
   {% if user_profile %}
   <div class="flex h-full" x-data="{ mobileMenuOpen: false }">
-    <aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0 fixed md:relative inset-y-0 left-0 z-40 transform transition-transform md:transform-none -translate-x-full md:translate-x-0" :class="{ 'translate-x-0': mobileMenuOpen }">
-      <div class="p-4 border-b border-slate-200 dark:border-slate-700">
-        <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-xl font-logo font-bold text-brand-600 dark:text-brand-400">
-          <img src="{% static 'img/sillage-logo.svg' %}" alt="" class="w-8 h-8" aria-hidden="true">
-          Sillage
+    <aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0 fixed md:relative inset-y-0 left-0 z-40 transform transition-transform duration-200 md:transform-none -translate-x-full md:translate-x-0" :class="{ 'translate-x-0': mobileMenuOpen }">
+      <div class="h-16 px-5 flex items-center shrink-0 border-b border-slate-200 dark:border-slate-700">
+        <a href="{% url 'dashboard' %}" class="flex items-center gap-2.5 cursor-pointer">
+          <img src="{% static 'img/sillage-logo.svg' %}" alt="Sillage" class="w-7 h-7">
+          <span class="text-xl font-logo font-bold text-brand-600 dark:text-brand-400">Sillage</span>
         </a>
       </div>
-      <nav class="flex-1 p-4 space-y-1">
-        <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Dashboard</a>
-        <a href="{% url 'contact_list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Contacts</a>
-        <a href="{% url 'pipeline' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Pipeline</a>
-        <a href="{% url 'policy_list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Policies</a>
-        <a href="{% url 'board_list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Boards</a>
-        <a href="{% url 'calendar' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Calendar</a>
-        <a href="{% url 'task_list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Tasks</a>
-        <a href="{% url 'document_list' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Documents</a>
-        <a href="{% url 'pricing' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Billing</a>
-        <div class="pt-2 mt-2 border-t border-slate-200 dark:border-slate-700">
-          <p class="px-3 py-1 text-xs font-medium text-slate-500 uppercase">Settings</p>
-          <a href="{% url 'profile_settings' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Profile</a>
-          <a href="{% url 'org_settings' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Company</a>
-          <a href="{% url 'team_settings' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">Team</a>
+      <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto" aria-label="Main navigation">
+        {% url 'dashboard' as u_dash %}
+        {% url 'contact_list' as u_contacts %}
+        {% url 'pipeline' as u_pipeline %}
+        {% url 'policy_list' as u_policies %}
+        {% url 'board_list' as u_boards %}
+        {% url 'calendar' as u_calendar %}
+        {% url 'task_list' as u_tasks %}
+        {% url 'document_list' as u_docs %}
+        {% url 'pricing' as u_billing %}
+
+        <a href="{{ u_dash }}" class="nav-link {% if request.path == u_dash %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
+          Dashboard
+        </a>
+
+        <a href="{{ u_contacts }}" class="nav-link {% if request.path == u_contacts %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
+          Contacts
+        </a>
+
+        <a href="{{ u_pipeline }}" class="nav-link {% if request.path == u_pipeline %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+          Pipeline
+        </a>
+
+        {% has_feature "automations" as can_automations %}
+        {% if can_automations %}
+        {% url 'automation_list' as u_automations %}
+        <a href="{{ u_automations }}" class="nav-link {% if request.path == u_automations %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/></svg>
+          Automations
+        </a>
+        {% endif %}
+
+        <a href="{{ u_policies }}" class="nav-link {% if request.path == u_policies %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
+          Policies
+        </a>
+
+        <a href="{{ u_boards }}" class="nav-link {% if request.path == u_boards %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z"/></svg>
+          Boards
+        </a>
+
+        <a href="{{ u_calendar }}" class="nav-link {% if request.path == u_calendar %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+          Calendar
+        </a>
+
+        <a href="{{ u_tasks }}" class="nav-link {% if request.path == u_tasks %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+          Tasks
+        </a>
+
+        <a href="{{ u_docs }}" class="nav-link {% if request.path == u_docs %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v8.25m19.5 0A2.25 2.25 0 0 1 19.5 16.5h-15a2.25 2.25 0 0 1-2.25-2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 16.91a2.25 2.25 0 0 1-1.07-1.916V14.25"/></svg>
+          Documents
+        </a>
+
+        <a href="{{ u_billing }}" class="nav-link {% if request.path == u_billing %}active{% endif %}">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg>
+          Billing
+        </a>
+
+        <div class="pt-3 mt-3 border-t border-slate-200 dark:border-slate-700">
+          <p class="px-3 mb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Settings</p>
+          {% url 'profile_settings' as u_profile %}
+          {% url 'org_settings' as u_org %}
+          {% url 'team_settings' as u_team %}
+          <a href="{{ u_profile }}" class="nav-link {% if request.path == u_profile %}active{% endif %}">
+            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+            Profile
+          </a>
+          <a href="{{ u_org }}" class="nav-link {% if request.path == u_org %}active{% endif %}">
+            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+            Company
+          </a>
+          <a href="{{ u_team }}" class="nav-link {% if request.path == u_team %}active{% endif %}">
+            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>
+            Team
+          </a>
         </div>
       </nav>
-      <div class="p-4 border-t border-slate-200 dark:border-slate-700">
-        <a href="{% url 'logout' %}" class="block px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-sm">Log out</a>
+      <div class="px-3 py-3 border-t border-slate-200 dark:border-slate-700 shrink-0">
+        <a href="{% url 'logout' %}" class="nav-link text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"/></svg>
+          Log out
+        </a>
       </div>
     </aside>
     <div class="fixed inset-0 bg-black/50 z-30 md:hidden" x-show="mobileMenuOpen" x-transition @click="mobileMenuOpen = false" style="display: none;"></div>
     <main class="flex-1 overflow-auto min-w-0">
-      <header class="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <header class="sticky top-0 z-10 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 px-4 md:px-6 h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer" aria-label="Open menu">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
-          <h1 class="text-lg font-semibold">{% block page_title %}Dashboard{% endblock %}</h1>
-          <form method="get" action="{% url 'global_search' %}" class="hidden md:flex flex-1 max-w-xs ml-4">
-            <input type="search" name="q" placeholder="Search..." class="w-full px-3 py-1.5 text-sm border rounded-lg dark:bg-slate-700 dark:border-slate-600">
+          <h1 class="text-base font-semibold truncate">{% block page_title %}Dashboard{% endblock %}</h1>
+          <form method="get" action="{% url 'global_search' %}" class="hidden md:flex items-center ml-2" role="search">
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+              <input type="search" name="q" placeholder="Search…" aria-label="Search" class="pl-9 pr-4 py-1.5 text-sm border border-slate-200 dark:border-slate-600 rounded-lg w-52 bg-slate-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600 focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+            </div>
           </form>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 shrink-0">
           {% if user_organizations|length > 1 %}
-          <form method="post" action="{% url 'switch_org' %}" class="flex items-center gap-2">
+          <form method="post" action="{% url 'switch_org' %}">
             {% csrf_token %}
-            <select name="org_id" onchange="this.form.submit()" class="text-sm px-2 py-1 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700">
+            <select name="org_id" onchange="this.form.submit()" class="text-sm px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 cursor-pointer focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors">
               {% for o in user_organizations %}
               <option value="{{ o.id }}" {% if current_org and current_org.id == o.id %}selected{% endif %}>{{ o.name }}</option>
               {% endfor %}
             </select>
           </form>
           {% elif current_org %}
-          <span class="text-sm text-slate-500">{{ current_org.name }}</span>
+          <span class="text-sm text-slate-500 hidden sm:block">{{ current_org.name }}</span>
           {% endif %}
-          <a href="{% url 'create_org' %}" class="text-sm text-brand-600 hover:underline">+ Add company</a>
-          <span class="text-sm text-slate-500">{{ user_profile.name|default:user_profile.email }}</span>
-          <button type="button" onclick="document.documentElement.classList.toggle('dark');localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')" class="text-sm px-3 py-1 rounded border border-slate-300 dark:border-slate-600">Toggle dark</button>
+          <a href="{% url 'create_org' %}" class="hidden sm:inline-flex text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 px-2 py-1 rounded hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors cursor-pointer">+ New org</a>
+          <button type="button" id="theme-toggle" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer" aria-label="Toggle theme">
+            <svg class="w-5 h-5 hidden dark:block text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>
+            <svg class="w-5 h-5 dark:hidden text-slate-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
+          </button>
+          <div class="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 flex items-center justify-center text-sm font-semibold select-none cursor-default shrink-0" title="{{ user_profile.name|default:user_profile.email }}" aria-label="{{ user_profile.name|default:user_profile.email }}">
+            {{ user_profile.name|default:user_profile.email|slice:":1"|upper }}
+          </div>
         </div>
       </header>
       <div class="p-4 md:p-6">

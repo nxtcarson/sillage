@@ -1,5 +1,5 @@
 from django import forms
-from .models import Contact, Lead, Policy, Task, Activity, PipelineStage
+from .models import Contact, Lead, Policy, Task, Activity, PipelineStage, Automation
 
 INPUT_CLASS = "w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700"
 
@@ -81,3 +81,28 @@ class PipelineStageForm(forms.ModelForm):
     class Meta:
         model = PipelineStage
         fields = ["name", "order", "color"]
+
+
+class AutomationForm(forms.ModelForm):
+    class Meta:
+        model = Automation
+        fields = ["name", "trigger_stage", "action_title", "action_due_days", "is_active"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["trigger_stage"].required = True
+        labels = {
+            "trigger_stage": "When lead enters this stage",
+            "action_title": "Create task with title",
+            "action_due_days": "Due in (days from now)",
+        }
+        help_texts = {
+            "action_title": "Use {contact} and {stage} as placeholders.",
+        }
+        widgets = {
+            "name": forms.TextInput(attrs={"class": INPUT_CLASS}),
+            "trigger_stage": forms.Select(attrs={"class": INPUT_CLASS}),
+            "action_title": forms.TextInput(attrs={"class": INPUT_CLASS, "placeholder": "e.g. Call {contact} – {stage}"}),
+            "action_due_days": forms.NumberInput(attrs={"class": INPUT_CLASS, "min": 0}),
+            "is_active": forms.CheckboxInput(attrs={"class": "rounded"}),
+        }

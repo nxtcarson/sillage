@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Automations | Sillage{% endblock %}
+{% block page_title %}Pipeline automations{% endblock %}
+{% block content %}
+<div class="p-4 md:p-6 max-w-4xl">
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <p class="text-slate-600 dark:text-slate-400">When a lead moves to a stage, Sillage can create a task for you. Rules run on Standard and Pro plans only.</p>
+    <a href="{% url 'automation_create' %}" class="shrink-0 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">New rule</a>
+  </div>
+  {% if automations %}
+  <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-lg">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-100 dark:bg-slate-800 text-left">
+        <tr>
+          <th class="px-4 py-2">Name</th>
+          <th class="px-4 py-2">When lead enters</th>
+          <th class="px-4 py-2">Action</th>
+          <th class="px-4 py-2">Due in</th>
+          <th class="px-4 py-2">On</th>
+          <th class="px-4 py-2 w-32"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in automations %}
+        <tr class="border-t border-slate-200 dark:border-slate-700">
+          <td class="px-4 py-3 font-medium">{{ a.name }}</td>
+          <td class="px-4 py-3">{{ a.trigger_stage.name|default:"—" }}</td>
+          <td class="px-4 py-3">{{ a.get_action_type_display }}: {{ a.action_title }}</td>
+          <td class="px-4 py-3">{{ a.action_due_days }} day{{ a.action_due_days|pluralize }}</td>
+          <td class="px-4 py-3">
+            <form method="post" action="{% url 'automation_toggle' a.pk %}" class="inline">{% csrf_token %}
+              <button type="submit" class="text-sm {% if a.is_active %}text-green-600{% else %}text-slate-500{% endif %} hover:underline">
+                {% if a.is_active %}Active{% else %}Off{% endif %}
+              </button>
+            </form>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <a href="{% url 'automation_edit' a.pk %}" class="text-brand-600 hover:underline">Edit</a>
+            <form method="post" action="{% url 'automation_delete' a.pk %}" class="inline ml-2" onsubmit="return confirm('Delete this rule?');">{% csrf_token %}
+              <button type="submit" class="text-red-600 hover:underline">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-slate-500 dark:text-slate-400">No automations yet. <a href="{% url 'automation_create' %}" class="text-brand-600 hover:underline">Create one</a> to get tasks when leads enter a stage.</p>
+  {% endif %}
+</div>
+{% endblock %}

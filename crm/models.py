@@ -159,3 +159,32 @@ class Document(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Automation(models.Model):
+    TRIGGER_CHOICES = [
+        ("lead_stage_change", "Lead moves to stage"),
+    ]
+    ACTION_CHOICES = [
+        ("create_task", "Create a task"),
+    ]
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="automations")
+    name = models.CharField(max_length=255)
+    trigger_type = models.CharField(max_length=50, choices=TRIGGER_CHOICES, default="lead_stage_change")
+    trigger_stage = models.ForeignKey(
+        PipelineStage, on_delete=models.SET_NULL, related_name="automations", null=True, blank=True
+    )
+    action_type = models.CharField(max_length=50, choices=ACTION_CHOICES, default="create_task")
+    action_title = models.CharField(
+        max_length=255,
+        help_text="Task title. Use {contact} and {stage} as placeholders.",
+    )
+    action_due_days = models.IntegerField(default=1)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name

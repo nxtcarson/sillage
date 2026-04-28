@@ -5,10 +5,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
+from django.views.decorators.http import require_http_methods
 import json
-from core.decorators import require_auth, require_role
-from .models import Contact, Lead, Policy, PipelineStage, Task, Activity
-from .forms import ContactForm, LeadForm, PolicyForm, TaskForm, ActivityForm
+from core.decorators import require_auth, require_role, require_tier
+from .models import Contact, Lead, Policy, PipelineStage, Task, Activity, Automation
+from .forms import ContactForm, LeadForm, PolicyForm, TaskForm, ActivityForm, AutomationForm
+from .automations import fire_lead_stage_automations
 
 
 def _get_org(request):
@@ -393,6 +395,8 @@ def lead_create(request):
         obj = form.save(commit=False)
         obj.organization = org
         obj.save()
+        if obj.stage_id:
+            fire_lead_stage_automations(obj, None, obj.stage, org, request.user_profile)
         if request.headers.get("HX-Request"):
             return render(request, "partials/lead_card.html", {"lead": obj})
         return redirect("pipeline")
@@ -409,8 +413,86 @@ def lead_move(request, pk):
     stage_id = request.POST.get("stage_id") or request.GET.get("stage_id")
     if stage_id:
         stage = get_object_or_404(PipelineStage, pk=stage_id, organization=org)
+        old_stage = lead.stage
         lead.stage = stage
         lead.save()
+        fire_lead_stage_automations(lead, old_stage, stage, org, request.user_profile)
     if request.headers.get("HX-Request"):
         return render(request, "partials/lead_card.html", {"lead": lead})
     return redirect("pipeline")
+
+
+@require_auth
+@require_tier("standard", "pro")
+@require_role("owner", "admin", "agent")
+def automation_list(request):
+    org = _get_org(request)
+    if not org:
+        return redirect("login")
+    automations = Automation.objects.filter(organization=org).select_related("trigger_stage")
+    return render(request, "crm/automations/list.html", {"automations": automations, "org": org})
+
+
+@require_auth
+@require_tier("standard", "pro")
+@require_role("owner", "admin", "agent")
+def automation_create(request):
+    org = _get_org(request)
+    if not org:
+        return redirect("login")
+    form = AutomationForm(request.POST or None)
+    form.fields["trigger_stage"].queryset = PipelineStage.objects.filter(organization=org)
+    if form.is_valid():
+        auto = form.save(commit=False)
+        auto.organization = org
+        auto.trigger_type = "lead_stage_change"
+        auto.action_type = "create_task"
+        auto.save()
+        return redirect("automation_list")
+    return render(request, "crm/automations/form.html", {"form": form, "org": org, "title": "New automation"})
+
+
+@require_auth
+@require_tier("standard", "pro")
+@require_role("owner", "admin", "agent")
+def automation_edit(request, pk):
+    org = _get_org(request)
+    if not org:
+        return redirect("login")
+    auto = get_object_or_404(Automation, pk=pk, organization=org)
+    form = AutomationForm(request.POST or None, instance=auto)
+    form.fields["trigger_stage"].queryset = PipelineStage.objects.filter(organization=org)
+    if form.is_valid():
+        auto = form.save(commit=False)
+        auto.trigger_type = "lead_stage_change"
+        auto.action_type = "create_task"
+        auto.save()
+        return redirect("automation_list")
+    return render(request, "crm/automations/form.html", {"form": form, "org": org, "title": "Edit automation", "automation": auto})
+
+
+@require_auth
+@require_tier("standard", "pro")
+@require_role("owner", "admin", "agent")
+@require_http_methods(["POST"])
+def automation_delete(request, pk):
+    org = _get_org(request)
+    if not org:
+        return redirect("login")
+    auto = get_object_or_404(Automation, pk=pk, organization=org)
+    auto.delete()
+    return redirect("automation_list")
+
+
+@require_auth
+@require_tier("standard", "pro")
+@require_role("owner", "admin", "agent")
+@require_http_methods(["POST"])
+def automation_toggle(request, pk):
+    org = _get_org(request)
+    if not org:
+        return redirect("login")
+    auto = get_object_or_404(Automation, pk=pk, organization=org)
+    auto.is_active = not auto.is_active
+    auto.save(update_fields=["is_active"])
+    return redirect("automation_list")

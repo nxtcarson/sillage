@@ -23,11 +23,9 @@ def user_profile(request):
 
 
 def firebase_config(request):
-    finish_url = request.build_absolute_uri("/auth/finish-sign-in/")
     return {
         "firebase_api_key": os.environ.get("FIREBASE_API_KEY", ""),
         "firebase_auth_domain": os.environ.get("FIREBASE_AUTH_DOMAIN", ""),
         "firebase_project_id": os.environ.get("FIREBASE_PROJECT_ID", ""),
         "firebase_storage_bucket": os.environ.get("FIREBASE_STORAGE_BUCKET", ""),
-        "firebase_finish_sign_in_url": finish_url,
     }

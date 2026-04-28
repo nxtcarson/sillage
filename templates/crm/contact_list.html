@@ -1,62 +1,83 @@
 {% extends "base.html" %}
 {% block page_title %}Contacts{% endblock %}
 {% block content %}
-<div class="flex justify-between items-center mb-6">
-  <form method="get" class="flex gap-2 flex-wrap">
-    <input type="text" name="q" value="{{ search }}" placeholder="Search..." class="px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
-    <select name="status" class="px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+<div class="page-header">
+  <form method="get" class="flex gap-2 flex-wrap items-center">
+    <div class="relative">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+      <input type="text" name="q" value="{{ search }}" placeholder="Search contacts…" class="pl-9 pr-4 py-2 w-52">
+    </div>
+    <select name="status" class="py-2 px-3">
       <option value="">All statuses</option>
       <option value="lead" {% if status_filter == 'lead' %}selected{% endif %}>Lead</option>
       <option value="prospect" {% if status_filter == 'prospect' %}selected{% endif %}>Prospect</option>
       <option value="client" {% if status_filter == 'client' %}selected{% endif %}>Client</option>
     </select>
-    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Filter</button>
+    <button type="submit" class="btn-secondary py-2">Filter</button>
   </form>
   <div class="flex gap-2">
-    <a href="{% url 'contacts_export' %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Export CSV</a>
-    <a href="{% url 'contact_create' %}" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Add Contact</a>
+    <a href="{% url 'contacts_export' %}" class="btn-secondary">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+      Export CSV
+    </a>
+    <a href="{% url 'contact_create' %}" class="btn-primary">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+      Add Contact
+    </a>
   </div>
 </div>
-<div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+
+<div class="card overflow-hidden">
   <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-    <thead class="bg-slate-50 dark:bg-slate-700">
+    <thead class="bg-slate-50 dark:bg-slate-700/50">
       <tr>
-        <th class="px-4 py-3 text-left text-sm font-medium">Name</th>
-        <th class="px-4 py-3 text-left text-sm font-medium">Email</th>
-        <th class="px-4 py-3 text-left text-sm font-medium">Status</th>
-        <th class="px-4 py-3 text-left text-sm font-medium">Assigned</th>
-        <th class="px-4 py-3 text-right text-sm font-medium">Actions</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Name</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">Email</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Assigned</th>
+        <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
       {% for contact in contacts %}
-      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors">
         <td class="px-4 py-3">
-          <a href="{% url 'contact_detail' contact.pk %}" class="text-brand-600 hover:underline font-medium">{{ contact.full_name }}</a>
+          <a href="{% url 'contact_detail' contact.pk %}" class="font-medium text-slate-900 dark:text-slate-100 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">{{ contact.full_name }}</a>
         </td>
-        <td class="px-4 py-3">{{ contact.email }}</td>
-        <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ contact.status }}</span></td>
-        <td class="px-4 py-3">{{ contact.assigned_agent.name|default:"-" }}</td>
+        <td class="px-4 py-3 text-sm text-slate-500 hidden sm:table-cell">{{ contact.email }}</td>
+        <td class="px-4 py-3">
+          <span class="{% if contact.status == 'lead' %}badge-lead{% elif contact.status == 'prospect' %}badge-prospect{% elif contact.status == 'client' %}badge-client{% else %}badge-default{% endif %}">
+            {{ contact.status|capfirst }}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-sm text-slate-500 hidden md:table-cell">{{ contact.assigned_agent.name|default:"—" }}</td>
         <td class="px-4 py-3 text-right">
-          <a href="{% url 'contact_edit' contact.pk %}" class="text-brand-600 hover:underline text-sm">Edit</a>
+          <a href="{% url 'contact_edit' contact.pk %}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline font-medium cursor-pointer">Edit</a>
         </td>
       </tr>
       {% empty %}
-      <tr><td colspan="5" class="px-4 py-12">
-        <div class="text-center">
-          <p class="text-4xl mb-2">👤</p>
-          <p class="text-slate-500 mb-4">No contacts yet. Add your first contact to start tracking leads and clients.</p>
-          <a href="{% url 'contact_create' %}" class="inline-block px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Add Contact</a>
-        </div>
-      </td></tr>
+      <tr>
+        <td colspan="5" class="px-4">
+          <div class="empty-state">
+            <svg class="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
+            <p class="empty-state-title">No contacts found</p>
+            <p class="empty-state-desc">Add your first contact to start tracking leads and clients.</p>
+            <a href="{% url 'contact_create' %}" class="btn-primary">Add Contact</a>
+          </div>
+        </td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
   {% if contacts.has_other_pages %}
-  <div class="px-4 py-3 border-t flex justify-between">
-    {% if contacts.has_previous %}<a href="?page={{ contacts.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="text-brand-600">Previous</a>{% else %}<span></span>{% endif %}
-    <span>Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}</span>
-    {% if contacts.has_next %}<a href="?page={{ contacts.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="text-brand-600">Next</a>{% else %}<span></span>{% endif %}
+  <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-sm">
+    {% if contacts.has_previous %}
+    <a href="?page={{ contacts.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn-secondary py-1.5 text-xs">Previous</a>
+    {% else %}<span></span>{% endif %}
+    <span class="text-slate-500">Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}</span>
+    {% if contacts.has_next %}
+    <a href="?page={{ contacts.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="btn-secondary py-1.5 text-xs">Next</a>
+    {% else %}<span></span>{% endif %}
   </div>
   {% endif %}
 </div>

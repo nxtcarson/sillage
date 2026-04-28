@@ -1,167 +1,75 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-  <div class="w-full max-w-md p-8 bg-white dark:bg-slate-800 rounded-xl shadow-lg">
-    <h1 class="text-2xl font-bold mb-6">Sign up</h1>
-    <div id="auth-container">
-      <div class="space-y-4">
+<div class="min-h-screen flex">
+  <div class="hidden lg:flex lg:w-1/2 bg-brand-600 dark:bg-brand-800 flex-col items-center justify-center px-12 py-16 relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full"></div>
+      <div class="absolute -bottom-32 -left-32 w-[28rem] h-[28rem] bg-white/10 rounded-full"></div>
+    </div>
+    <div class="relative z-10 text-white text-center max-w-sm">
+      <div class="flex items-center justify-center gap-3 mb-10">
+        <img src="{% static 'img/sillage-logo.svg' %}" alt="" class="w-10 h-10 brightness-0 invert" aria-hidden="true">
+        <span class="text-3xl font-logo font-bold">Sillage</span>
+      </div>
+      <h2 class="text-2xl font-display font-semibold mb-3 leading-snug">Start for free today.</h2>
+      <p class="text-brand-100 leading-relaxed mb-8">No credit card required. Your pipeline, contacts, and policies in one place.</p>
+      <ul class="space-y-3 text-left">
+        <li class="flex items-center gap-2.5 text-brand-100 text-sm">
+          <svg class="w-4 h-4 text-brand-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+          100 contacts on the free plan
+        </li>
+        <li class="flex items-center gap-2.5 text-brand-100 text-sm">
+          <svg class="w-4 h-4 text-brand-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+          3 Kanban boards included
+        </li>
+        <li class="flex items-center gap-2.5 text-brand-100 text-sm">
+          <svg class="w-4 h-4 text-brand-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+          Invite up to 2 teammates
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="flex-1 flex items-center justify-center px-6 py-12 bg-slate-50 dark:bg-slate-900">
+    <div class="w-full max-w-sm">
+      <div class="lg:hidden flex items-center gap-2 mb-8">
+        <img src="{% static 'img/sillage-logo.svg' %}" alt="" class="w-8 h-8" aria-hidden="true">
+        <span class="text-xl font-logo font-bold text-brand-600 dark:text-brand-400">Sillage</span>
+      </div>
+      <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-1">Create your account</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Free forever. No credit card needed.</p>
+      <form method="post" action="{% url 'signup' %}" class="space-y-5" novalidate>
+        {% csrf_token %}
+        {% if error %}
+        <div class="flex items-start gap-2.5 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800" role="alert">
+          <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+          <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+        </div>
+        {% endif %}
         <div>
-          <label class="block text-sm font-medium mb-1">Name</label>
-          <input type="text" id="name" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700" placeholder="Your name">
+          <label for="id_name" class="form-label">Full name</label>
+          <input type="text" name="name" id="id_name" class="w-full px-3 py-2.5" placeholder="Alex Johnson" autocomplete="name" value="{{ request.POST.name|default:''|escape }}">
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1">Email</label>
-          <input type="email" id="email" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700" placeholder="you@example.com">
+          <label for="id_email" class="form-label">Work email</label>
+          <input type="email" name="email" id="id_email" required class="w-full px-3 py-2.5" placeholder="you@example.com" autocomplete="email" value="{{ request.POST.email|default:''|escape }}">
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1">Password</label>
-          <input type="password" id="password" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700" placeholder="Min 6 characters">
+          <label for="id_password" class="form-label">Password</label>
+          <input type="password" name="password" id="id_password" required class="w-full px-3 py-2.5" placeholder="At least 8 characters" minlength="8" autocomplete="new-password">
         </div>
-        <p id="auth-loading" class="text-slate-600 dark:text-slate-400 text-sm hidden"></p>
-        <p id="auth-error" class="text-red-500 text-sm hidden"></p>
-        <p id="magic-link-sent" class="text-green-600 text-sm hidden">Check your email for a sign-in link.</p>
-        <button type="button" id="btn-signup" class="w-full py-2 px-4 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Create account</button>
-        <button type="button" id="btn-magic" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Send magic link</button>
-        <button type="button" id="btn-google" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Continue with Google</button>
-        <button type="button" id="btn-google-redirect" class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-sm hidden" data-fallback>Continue with Google (redirect)</button>
+        <button type="submit" class="btn-primary w-full py-2.5 text-base">Create free account</button>
+      </form>
+      <p class="mt-6 text-sm text-center text-slate-500 dark:text-slate-400">
+        Already have an account? <a href="{% url 'login' %}" class="text-brand-600 dark:text-brand-400 font-medium hover:underline">Sign in</a>
+      </p>
+      <div class="mt-4 text-center">
+        <a href="{% url 'landing' %}" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
+          Back to home
+        </a>
       </div>
     </div>
-    <p class="mt-4 text-sm text-slate-500">
-      Already have an account? <a href="{% url 'login' %}" class="text-brand-600 hover:underline">Log in</a>
-    </p>
-    <a href="{% url 'landing' %}" class="mt-4 inline-block text-slate-500 hover:underline text-sm">Back to home</a>
   </div>
 </div>
-<form id="auth-form" style="display:none">{% csrf_token %}</form>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script>
-(function() {
-  const firebaseConfig = {
-    apiKey: "{{ firebase_api_key }}",
-    authDomain: "{{ firebase_auth_domain }}",
-    projectId: "{{ firebase_project_id }}",
-    storageBucket: "{{ firebase_storage_bucket }}",
-  };
-  const finishSignInUrl = "{{ firebase_finish_sign_in_url|escapejs }}";
-  const loginUrl = "{% url 'firebase_login' %}";
-  const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
-  const csrfToken = csrfInput ? csrfInput.value : '';
-  if (!firebaseConfig.apiKey) {
-    document.getElementById('auth-error').textContent = 'Firebase not configured. Add FIREBASE_API_KEY to .env';
-    document.getElementById('auth-error').classList.remove('hidden');
-    return;
-  }
-  let app;
-  try {
-    app = firebase.app();
-  } catch (e) {
-    app = firebase.initializeApp(firebaseConfig);
-  }
-  const auth = firebase.auth();
-  const errEl = document.getElementById('auth-error');
-  const showErr = (msg) => { errEl.textContent = msg; errEl.classList.remove('hidden'); };
-  const hideErr = () => { errEl.textContent = ''; errEl.classList.add('hidden'); };
-  const loadingEl = document.getElementById('auth-loading');
-  const setLoading = (msg) => {
-    if (loadingEl) {
-      if (msg) { loadingEl.textContent = msg; loadingEl.classList.remove('hidden'); }
-      else { loadingEl.textContent = ''; loadingEl.classList.add('hidden'); }
-    }
-  };
-  const doLogin = async (token) => {
-    setLoading('Signing you in…');
-    hideErr();
-    const form = new FormData();
-    form.append('id_token', token);
-    form.append('csrfmiddlewaretoken', csrfToken);
-    const r = await fetch(loginUrl, { method: 'POST', body: form, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-    let data;
-    try { data = await r.json(); } catch (_) { setLoading(''); showErr('Server error'); return; }
-    if (data.ok) window.location = data.redirect;
-    else {
-      setLoading('');
-      showErr(data.error || 'Signup failed');
-      if (data.error && (data.error.includes('Firebase Admin') || data.error.includes('not configured'))) {
-        errEl.classList.add('font-semibold', 'bg-red-50', 'dark:bg-red-900/20', 'p-3', 'rounded');
-      }
-    }
-  };
-  document.getElementById('btn-signup').onclick = async () => {
-    hideErr();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const name = document.getElementById('name').value.trim();
-    if (!email || !password) { showErr('Enter email and password'); return; }
-    try {
-      let cred;
-      try {
-        cred = await auth.signInWithEmailAndPassword(email, password);
-      } catch (e) {
-        if (e.code === 'auth/user-not-found') {
-          cred = await auth.createUserWithEmailAndPassword(email, password);
-          if (cred.user && name) await cred.user.updateProfile({ displayName: name });
-        } else throw e;
-      }
-      const token = await cred.user.getIdToken();
-      await doLogin(token);
-    } catch (e) {
-      if (e.code === 'auth/wrong-password') showErr('Wrong password. Try logging in instead.');
-      else if (e.code === 'auth/email-already-in-use') showErr('This email is already registered. Try logging in.');
-      else showErr(e.message || 'Signup failed');
-    }
-  };
-  document.getElementById('btn-magic').onclick = async () => {
-    hideErr();
-    const email = document.getElementById('email').value.trim();
-    if (!email) { showErr('Enter your email address'); return; }
-    const name = document.getElementById('name').value.trim();
-    if (name) window.localStorage.setItem('nameForSignIn', name);
-    try {
-      const actionCodeSettings = { url: finishSignInUrl, handleCodeInApp: true };
-      await auth.sendSignInLinkToEmail(email, actionCodeSettings);
-      window.localStorage.setItem('emailForSignIn', email);
-      document.getElementById('magic-link-sent').classList.remove('hidden');
-    } catch (e) { showErr(e.message || 'Failed to send link'); }
-  };
-  const isLocalhost = /^localhost$|^127\.0\.0\.1$/.test(window.location.hostname);
-  const doGoogleSignIn = async (useRedirect) => {
-    hideErr();
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-      if (useRedirect || isLocalhost) {
-        await auth.signInWithRedirect(provider);
-        return;
-      }
-      const cred = await auth.signInWithPopup(provider);
-      const token = await cred.user.getIdToken();
-      await doLogin(token);
-    } catch (e) {
-      if (e.code === 'auth/popup-closed-by-user') {
-        showErr('Popup closed. Try "Continue with Google (redirect)" below, or check browser privacy settings.');
-      } else {
-        showErr(e.message || 'Signup failed');
-      }
-    }
-  };
-  const fallbackBtn = document.getElementById('btn-google-redirect');
-  if (!isLocalhost) fallbackBtn.classList.remove('hidden');
-  document.getElementById('btn-google').onclick = () => doGoogleSignIn(isLocalhost);
-  fallbackBtn.onclick = () => doGoogleSignIn(true);
-
-  const hasRedirectParams = !!(window.location.search || window.location.hash);
-  if (hasRedirectParams) setLoading('Completing sign-in…');
-  auth.getRedirectResult().then(async (result) => {
-    if (result.user) {
-      const token = await result.user.getIdToken();
-      await doLogin(token);
-    } else {
-      setLoading('');
-    }
-  }).catch((e) => {
-    setLoading('');
-    if (e.code !== 'auth/popup-closed-by-user') showErr(e.message);
-  });
-})();
-</script>
 {% endblock %}

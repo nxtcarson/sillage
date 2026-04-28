@@ -4,12 +4,11 @@ import secrets
 import uuid
 from datetime import timedelta
 
+from django.contrib.auth.hashers import check_password, make_password
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_POST, require_http_methods
 from core.decorators import require_auth
-from core.firebase import get_firebase_app, verify_id_token
 from core.org import get_current_org
 from .models import UserProfile, Organization, OrganizationMembership, Invitation
 
@@ -21,70 +20,70 @@ def _slugify(name):
     return f"{base}-{uuid.uuid4().hex[:8]}"
 
 
-@require_http_methods(["GET"])
+def _set_session_for_profile(request, profile):
+    org = profile.get_primary_organization() or profile.organization
+    request.session["user_id"] = profile.id
+    request.session["org_id"] = org.id if org else None
+    request.session["org_tier"] = org.tier if org else "free"
+
+
+@require_http_methods(["GET", "POST"])
 def login_page(request):
-    return render(request, "auth/login.html")
+    if request.session.get("user_id"):
+        return redirect("dashboard")
+    if request.method == "POST":
+        email = (request.POST.get("email") or "").strip().lower()
+        password = request.POST.get("password") or ""
+        if not email or not password:
+            return render(request, "auth/login.html", {
+                "error": "Enter email and password.",
+                "next": request.GET.get("next", "") or request.POST.get("next", ""),
+            })
+        profile = UserProfile.objects.select_related("organization").filter(email__iexact=email).first()
+        if not profile or not check_password(password, profile.password):
+            return render(request, "auth/login.html", {
+                "error": "Invalid email or password.",
+                "next": request.GET.get("next", "") or request.POST.get("next", ""),
+            })
+        _set_session_for_profile(request, profile)
+        nxt = (request.GET.get("next") or request.POST.get("next") or "").strip()
+        if nxt.startswith("/"):
+            return redirect(nxt)
+        if request.session.get("pending_invite_token"):
+            return redirect("invite_accept", token=request.session["pending_invite_token"])
+        return redirect("dashboard")
+    return render(request, "auth/login.html", {"next": request.GET.get("next", "")})
 
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "POST"])
 def signup_page(request):
+    if request.session.get("user_id"):
+        return redirect("dashboard")
+    if request.method == "POST":
+        name = (request.POST.get("name") or "").strip()
+        email = (request.POST.get("email") or "").strip().lower()
+        password = request.POST.get("password") or ""
+        if not email or not password:
+            return render(request, "auth/signup.html", {"error": "Email and password are required."})
+        if len(password) < 8:
+            return render(request, "auth/signup.html", {"error": "Password must be at least 8 characters."})
+        if UserProfile.objects.filter(email__iexact=email).exists():
+            return render(request, "auth/signup.html", {"error": "An account with this email already exists."})
+        org = Organization.objects.create(
+            name=f"{name or email}'s Company",
+            slug=_slugify(email or "user"),
+        )
+        profile = UserProfile.objects.create(
+            organization=org,
+            email=email,
+            name=name or email,
+            role="owner",
+            password=make_password(password),
+        )
+        OrganizationMembership.objects.create(user=profile, organization=org, role="owner", is_primary=True)
+        _set_session_for_profile(request, profile)
+        return redirect("dashboard")
     return render(request, "auth/signup.html")
-
-
-@require_http_methods(["GET"])
-def finish_sign_in_page(request):
-    return render(request, "auth/finish_sign_in.html")
-
-
-@require_POST
-def firebase_login(request):
-    try:
-        token = request.POST.get("id_token") or request.headers.get("Authorization", "").replace("Bearer ", "")
-        if not token:
-            logger.warning("Firebase login attempted without token")
-            return JsonResponse({"ok": False, "error": "No token provided"}, status=400)
-        if get_firebase_app() is None:
-            logger.error("Firebase login failed: Firebase Admin not configured")
-            return JsonResponse({"ok": False, "error": "Firebase Admin not configured. Add FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL to .env (see .env.example)."}, status=503)
-        decoded = verify_id_token(token)
-        if not decoded:
-            logger.warning("Firebase login failed: invalid token")
-            return JsonResponse({"ok": False, "error": "Invalid token"}, status=401)
-        uid = decoded.get("uid")
-        email = decoded.get("email", "")
-        name = decoded.get("name", "")
-        try:
-            profile = UserProfile.objects.select_related("organization").get(firebase_uid=uid)
-        except UserProfile.DoesNotExist:
-            org = Organization.objects.create(
-                name=f"{name or email}'s Company",
-                slug=_slugify(email or uid),
-            )
-            profile = UserProfile.objects.create(
-                firebase_uid=uid,
-                organization=org,
-                email=email,
-                name=name or email,
-                role="owner",
-            )
-            OrganizationMembership.objects.create(user=profile, organization=org, role="owner", is_primary=True)
-        org = profile.get_primary_organization()
-        if not org:
-            org = profile.organization
-        request.session["user_id"] = profile.id
-        request.session["org_id"] = org.id if org else None
-        request.session["org_tier"] = org.tier if org else "free"
-        pending = request.session.get("pending_invite_token")
-        redirect_url = f"/invite/{pending}/" if pending else "/dashboard/"
-        return JsonResponse({"ok": True, "redirect": redirect_url})
-    except Exception as e:
-        logger.exception("Firebase login unexpected error")
-        return JsonResponse({"ok": False, "error": str(e)}, status=500)
-
-
-@require_POST
-def firebase_signup(request):
-    return firebase_login(request)
 
 
 def logout_view(request):

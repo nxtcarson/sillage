@@ -29,4 +29,9 @@ urlpatterns = [
     path("documents/create/", document_views.document_create, name="document_create"),
     path("documents/<int:pk>/delete/", document_views.document_delete, name="document_delete"),
     path("calendar/", calendar_views.calendar_view, name="calendar"),
+    path("automations/", views.automation_list, name="automation_list"),
+    path("automations/create/", views.automation_create, name="automation_create"),
+    path("automations/<int:pk>/edit/", views.automation_edit, name="automation_edit"),
+    path("automations/<int:pk>/delete/", views.automation_delete, name="automation_delete"),
+    path("automations/<int:pk>/toggle/", views.automation_toggle, name="automation_toggle"),
 ]
