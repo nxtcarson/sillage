@@ -1,15 +1,15 @@
 # Sillage
 
-A full-featured insurance sales CRM built with Django, Firebase, HTMX, Tailwind CSS, and Stripe.
+A full-featured insurance sales CRM built as a multi-tenant SaaS application with Django, HTMX, Tailwind CSS, Alpine.js, and Stripe.
 
 ## Tech Stack
 
-- **Django 5.x** - Backend, ORM, views
-- **Firebase** - Auth (email + Google), Firestore, Storage
-- **HTMX** - Dynamic partial page updates
-- **Tailwind CSS** - Styling
-- **Alpine.js** - Lightweight JS (modals, mobile menu)
-- **Stripe** - Subscription billing
+- **Django 5.x** — Backend framework, ORM, views, authentication
+- **HTMX** — Dynamic partial page updates without full reloads
+- **Tailwind CSS** — Utility-first styling with custom design system
+- **Alpine.js** — Lightweight JS for modals and interactive UI
+- **Stripe** — Subscription billing and customer portal
+- **SQLite** — Local development database
 
 ## Setup
 
@@ -20,23 +20,18 @@ pip install -r requirements.txt
 npm install
 ```
 
-2. **Environment variables** — Doppler (syncs across machines)
+2. Configure environment variables — copy `.env.example` to `.env` and fill in values:
 
-```powershell
-winget install Doppler.Doppler
-.\doppler-setup.ps1
+```bash
+cp .env.example .env
 ```
 
-See [DOPPLER_SETUP.md](DOPPLER_SETUP.md) for the full variable list and where to get each value. If you have a `.env` file, the setup script can upload it to Doppler.
+Required variables:
+- `SECRET_KEY` — Django secret key
+- `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` — from [Stripe Dashboard](https://dashboard.stripe.com)
+- `STRIPE_WEBHOOK_SECRET` — from Stripe webhook settings
 
-Run the app: `.\run.ps1`
-
-**Alternative: Local .env file**
-
-Copy `.env.example` to `.env` and fill in your keys. `.env` is gitignored.
-
-- Firebase: [Firebase Console](https://console.firebase.google.com) — Web API key, Auth domain, Storage bucket, service account
-- Stripe: [Stripe Dashboard](https://dashboard.stripe.com) — API keys, create products/prices for tiers
+Alternatively, use Doppler for secret management — see [DOPPLER_SETUP.md](DOPPLER_SETUP.md).
 
 3. Run migrations:
 
@@ -60,19 +55,21 @@ Open http://127.0.0.1:8000 in your browser.
 
 ## Features
 
-- **Contacts** - CRUD, search, filter, activity timeline
-- **Pipeline** - Funnel stages with leads, move between stages
-- **Policies** - Track by carrier, type, status, renewals
-- **Kanban Boards** - Drag-and-drop cards (SortableJS)
-- **Tasks** - Assign to contacts, due dates
-- **Documents** - Upload to Firebase Storage, link to contacts/policies
-- **Calendar** - Monthly view of tasks and renewals (Standard+ tier)
-- **Dashboard** - KPIs, pipeline chart, activity feed
-- **Billing** - Stripe Checkout, Customer Portal, 4 pricing tiers
+- **Authentication** — Email/password signup, login, profile settings
+- **Multi-Org Support** — Team invitations, role-based access (admin, member, viewer)
+- **Contacts** — CRUD, search, filter, activity timeline
+- **Pipeline** — Funnel stages with leads, drag between stages
+- **Policies** — Track by carrier, type, status, and renewals
+- **Automations** — Trigger actions (e.g. create task) when lead stage changes
+- **Kanban Boards** — Drag-and-drop cards via SortableJS
+- **Dashboard** — KPIs, pipeline overview, activity feed
+- **Billing** — Stripe Checkout, Customer Portal, 4 pricing tiers
 
 ## Tier Gating
 
-- **Free** - 2 seats, 3 boards, 100 contacts
-- **Basic** - 5GB storage, priority support
-- **Standard** - Calendar view, 250 automations
-- **Pro** - Private boards, time tracking, 25K automations
+| Tier | Seats | Boards | Contacts | Storage | Automations |
+|------|-------|--------|----------|---------|-------------|
+| Free | 2 | 3 | 100 | — | — |
+| Basic | 5 | 10 | 500 | 5 GB | — |
+| Standard | 10 | 25 | 2,500 | 25 GB | 250 |
+| Pro | Unlimited | Unlimited | 25,000 | 100 GB | 25,000 |
