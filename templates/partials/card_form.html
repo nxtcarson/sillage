@@ -1,9 +1,33 @@
 <form method="post" action="{% if card %}{% url 'card_edit' card.pk %}{% else %}{% url 'card_create' column.board_id %}{% endif %}">
   {% csrf_token %}
   {% if column %}<input type="hidden" name="column_id" value="{{ column.pk }}">{% endif %}
-  {{ form.as_p }}
-  <div class="flex gap-2 mt-4">
-    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Save</button>
-    <button type="button" onclick="document.getElementById('card-modal').classList.add('hidden')" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Cancel</button>
+  <div class="space-y-3">
+    <div>
+      <label for="id_title" class="form-label">Title <span class="text-red-400">*</span></label>
+      {{ form.title }}
+      {% for e in form.title.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+    </div>
+    <div>
+      <label for="id_description" class="form-label">Description</label>
+      {{ form.description }}
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label for="id_due_date" class="form-label">Due date</label>
+        {{ form.due_date }}
+      </div>
+      <div>
+        <label for="id_assigned_to" class="form-label">Assign to</label>
+        {{ form.assigned_to }}
+      </div>
+    </div>
+    <div>
+      <label for="id_contact" class="form-label">Contact</label>
+      {{ form.contact }}
+    </div>
+  </div>
+  <div class="flex gap-2 mt-5">
+    <button type="submit" class="btn-primary flex-1">Save card</button>
+    <button type="button" onclick="document.getElementById('card-modal').classList.add('hidden')" class="btn-secondary">Cancel</button>
   </div>
 </form>

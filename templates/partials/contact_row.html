@@ -1,7 +1,16 @@
-<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-  <td class="px-4 py-3"><a href="{% url 'contact_detail' contact.pk %}" class="text-brand-600 font-medium">{{ contact.full_name }}</a></td>
-  <td class="px-4 py-3">{{ contact.email }}</td>
-  <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-600">{{ contact.status }}</span></td>
-  <td class="px-4 py-3">{{ contact.assigned_agent.name|default:"-" }}</td>
-  <td class="px-4 py-3 text-right"><a href="{% url 'contact_edit' contact.pk %}" class="text-brand-600 text-sm">Edit</a></td>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors">
+  <td class="px-4 py-3">
+    <div class="flex items-center gap-3">
+      <div class="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 flex items-center justify-center text-xs font-semibold shrink-0 select-none">{{ contact.full_name|slice:":1"|upper }}</div>
+      <a href="{% url 'contact_detail' contact.pk %}" class="font-medium text-slate-900 dark:text-slate-100 hover:text-brand-600 dark:hover:text-brand-400 transition-colors cursor-pointer">{{ contact.full_name }}</a>
+    </div>
+  </td>
+  <td class="px-4 py-3 text-sm text-slate-500">{{ contact.email }}</td>
+  <td class="px-4 py-3">
+    <span class="{% if contact.status == 'client' %}badge-client{% elif contact.status == 'prospect' %}badge-prospect{% else %}badge-lead{% endif %}">{{ contact.status|capfirst }}</span>
+  </td>
+  <td class="px-4 py-3 text-sm text-slate-500 hidden sm:table-cell">{{ contact.assigned_agent.name|default:"—" }}</td>
+  <td class="px-4 py-3 text-right">
+    <a href="{% url 'contact_edit' contact.pk %}" class="text-xs text-brand-600 dark:text-brand-400 hover:underline cursor-pointer">Edit</a>
+  </td>
 </tr>

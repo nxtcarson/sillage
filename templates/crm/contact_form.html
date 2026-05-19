@@ -1,12 +1,67 @@
 {% extends "base.html" %}
-{% block page_title %}{% if contact %}Edit{% else %}Add{% endif %} Contact{% endblock %}
+{% block page_title %}{% if contact %}Edit Contact{% else %}Add Contact{% endif %}{% endblock %}
 {% block content %}
-<form method="post" class="max-w-xl space-y-4">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <div class="flex gap-2">
-    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700">Save</button>
-    <a href="{% if contact %}{% url 'contact_detail' contact.pk %}{% else %}{% url 'contact_list' %}{% endif %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Cancel</a>
+<div class="max-w-xl">
+  <div class="card p-6">
+    <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-6">{% if contact %}Edit Contact{% else %}New Contact{% endif %}</h2>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label for="id_first_name" class="form-label">First name <span class="text-red-400">*</span></label>
+          {{ form.first_name }}
+          {% for e in form.first_name.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="id_last_name" class="form-label">Last name</label>
+          {{ form.last_name }}
+          {% for e in form.last_name.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+      </div>
+      <div>
+        <label for="id_email" class="form-label">Email address</label>
+        {{ form.email }}
+        {% for e in form.email.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="id_phone" class="form-label">Phone</label>
+        {{ form.phone }}
+        {% for e in form.phone.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="id_address" class="form-label">Address</label>
+        {{ form.address }}
+        {% for e in form.address.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label for="id_date_of_birth" class="form-label">Date of birth</label>
+          {{ form.date_of_birth }}
+          {% for e in form.date_of_birth.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="id_source" class="form-label">Source</label>
+          {{ form.source }}
+          {% for e in form.source.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label for="id_status" class="form-label">Status</label>
+          {{ form.status }}
+          {% for e in form.status.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="id_assigned_agent" class="form-label">Assigned to</label>
+          {{ form.assigned_agent }}
+          {% for e in form.assigned_agent.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary">Save contact</button>
+        <a href="{% if contact %}{% url 'contact_detail' contact.pk %}{% else %}{% url 'contact_list' %}{% endif %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
   </div>
-</form>
+</div>
 {% endblock %}

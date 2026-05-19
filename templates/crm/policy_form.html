@@ -1,12 +1,17 @@
 {% extends "base.html" %}
-{% block page_title %}{% if policy %}Edit{% else %}Add{% endif %} Policy{% endblock %}
+{% block page_title %}{% if policy %}Edit Policy{% else %}Add Policy{% endif %}{% endblock %}
 {% block content %}
-<form method="post" class="max-w-xl space-y-4">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <div class="flex gap-2">
-    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Save</button>
-    <a href="{% if policy %}{% url 'policy_detail' policy.pk %}{% else %}{% url 'policy_list' %}{% endif %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Cancel</a>
+<div class="max-w-xl">
+  <div class="card p-6">
+    <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-6">{% if policy %}Edit Policy{% else %}New Policy{% endif %}</h2>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {% include "forms/form_snippet.html" %}
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary">Save policy</button>
+        <a href="{% if policy %}{% url 'policy_detail' policy.pk %}{% else %}{% url 'policy_list' %}{% endif %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
   </div>
-</form>
+</div>
 {% endblock %}

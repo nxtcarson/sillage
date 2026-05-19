@@ -21,7 +21,7 @@
       {% for lead in stage.leads.all %}
       <div class="bg-white dark:bg-slate-800 rounded-lg p-3.5 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow cursor-pointer group">
         <a href="{% url 'contact_detail' lead.contact.pk %}" class="font-medium text-sm text-slate-900 dark:text-slate-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors block mb-1">{{ lead.contact.full_name }}</a>
-        <p class="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3">${{ lead.value|default:"0" }}</p>
+        <p class="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3">${{ lead.value|default:0|floatformat:0 }}</p>
         <form method="post" action="{% url 'lead_move' lead.pk %}">
           {% csrf_token %}
           <select name="stage_id" onchange="if(this.value) this.form.submit()" class="w-full text-xs py-1.5 px-2 border-slate-200 dark:border-slate-600 rounded-lg cursor-pointer bg-slate-50 dark:bg-slate-700">

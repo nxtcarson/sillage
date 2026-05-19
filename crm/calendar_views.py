@@ -1,9 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import date, timedelta
 from calendar import monthrange
-from core.decorators import require_auth, require_tier
+from core.decorators import require_auth
 from .models import Task, Policy
+
+MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+               "July", "August", "September", "October", "November", "December"]
 
 
 def _get_org(request):
@@ -28,11 +31,10 @@ def _month_weeks(year, month):
 
 
 @require_auth
-@require_tier("standard", "pro")
 def calendar_view(request):
     org = _get_org(request)
     if not org:
-        return render(request, "crm/calendar_upgrade.html")
+        return redirect("login")
     year = int(request.GET.get("year", timezone.now().year))
     month = int(request.GET.get("month", timezone.now().month))
     if month < 1:
@@ -62,8 +64,11 @@ def calendar_view(request):
     prev_year = year if month > 1 else year - 1
     next_month = month + 1 if month < 12 else 1
     next_year = year if month < 12 else year + 1
+    today = timezone.now().date()
     return render(request, "crm/calendar.html", {
         "year": year, "month": month,
+        "month_name": MONTH_NAMES[month - 1],
+        "today": today,
         "weeks": weeks,
         "prev_month": prev_month, "prev_year": prev_year,
         "next_month": next_month, "next_year": next_year,

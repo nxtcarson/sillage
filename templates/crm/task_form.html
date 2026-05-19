@@ -1,12 +1,54 @@
 {% extends "base.html" %}
-{% block page_title %}{% if task %}Edit{% else %}Add{% endif %} Task{% endblock %}
+{% block page_title %}{% if task %}Edit Task{% else %}Add Task{% endif %}{% endblock %}
 {% block content %}
-<form method="post" class="max-w-xl space-y-4">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <div class="flex gap-2">
-    <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg">Save</button>
-    <a href="{% url 'task_list' %}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Cancel</a>
+<div class="max-w-xl">
+  <div class="card p-6">
+    <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-6">{% if task %}Edit Task{% else %}New Task{% endif %}</h2>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label for="id_title" class="form-label">Title <span class="text-red-400">*</span></label>
+        {{ form.title }}
+        {% for e in form.title.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="id_description" class="form-label">Notes</label>
+        {{ form.description }}
+        {% for e in form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label for="id_due_date" class="form-label">Due date</label>
+          {{ form.due_date }}
+          {% for e in form.due_date.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="id_priority" class="form-label">Priority</label>
+          {{ form.priority }}
+          {% for e in form.priority.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label for="id_assigned_to" class="form-label">Assigned to</label>
+          {{ form.assigned_to }}
+          {% for e in form.assigned_to.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="id_related_contact" class="form-label">Contact</label>
+          {{ form.related_contact }}
+          {% for e in form.related_contact.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+      </div>
+      <div class="flex items-center gap-2 pt-1">
+        {{ form.completed }}
+        <label for="id_completed" class="text-sm text-slate-700 dark:text-slate-300 cursor-pointer">Mark as completed</label>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary">Save task</button>
+        <a href="{% url 'task_list' %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
   </div>
-</form>
+</div>
 {% endblock %}

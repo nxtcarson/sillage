@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from core.decorators import require_auth
 from .models import Document, Contact, Policy
@@ -24,7 +24,15 @@ def document_list(request):
     if policy_id:
         qs = qs.filter(policy_id=policy_id)
     documents = qs.order_by("-uploaded_at")[:50]
-    return render(request, "crm/document_list.html", {"documents": documents})
+    contacts = org.contacts.all().order_by("last_name", "first_name")[:200]
+    policies = org.policies.select_related("contact").order_by("-created_at")[:200]
+    return render(request, "crm/document_list.html", {
+        "documents": documents,
+        "contacts": contacts,
+        "policies": policies,
+        "filter_contact": contact_id,
+        "filter_policy": policy_id,
+    })
 
 
 @require_auth
@@ -33,24 +41,44 @@ def document_create(request):
     org = _get_org(request)
     if not org:
         return redirect("login")
-    url = request.POST.get("firebase_storage_url")
-    name = request.POST.get("name")
     contact_id = request.POST.get("contact") or None
     policy_id = request.POST.get("policy") or None
-    if not url or not name:
-        return JsonResponse({"ok": False, "error": "Missing url or name"}, status=400)
     contact = get_object_or_404(Contact, pk=contact_id, organization=org) if contact_id else None
     policy = get_object_or_404(Policy, pk=policy_id, organization=org) if policy_id else None
-    doc = Document.objects.create(
-        organization=org,
-        name=name,
-        firebase_storage_url=url,
-        contact=contact,
-        policy=policy,
-        uploaded_by=request.user_profile,
-    )
+
+    files = request.FILES.getlist("file")
+    url = request.POST.get("firebase_storage_url", "").strip()
+    name = request.POST.get("name", "").strip()
+    created = []
+
+    if files:
+        for uploaded in files:
+            doc = Document.objects.create(
+                organization=org,
+                name=uploaded.name,
+                file=uploaded,
+                contact=contact,
+                policy=policy,
+                uploaded_by=request.user_profile,
+            )
+            created.append(doc)
+    elif url and name:
+        doc = Document.objects.create(
+            organization=org,
+            name=name,
+            firebase_storage_url=url,
+            contact=contact,
+            policy=policy,
+            uploaded_by=request.user_profile,
+        )
+        created.append(doc)
+    else:
+        if request.headers.get("HX-Request"):
+            return HttpResponse("Choose a file to upload.", status=400)
+        return redirect("document_list")
+
     if request.headers.get("HX-Request"):
-        return render(request, "partials/document_row.html", {"doc": doc})
+        return render(request, "partials/document_rows.html", {"documents": created})
     return redirect("document_list")
 
 
@@ -61,8 +89,9 @@ def document_delete(request, pk):
     if not org:
         return redirect("login")
     doc = get_object_or_404(Document, pk=pk, organization=org)
+    if doc.file:
+        doc.file.delete(save=False)
     doc.delete()
     if request.headers.get("HX-Request"):
-        from django.http import HttpResponse
         return HttpResponse("")
     return redirect("document_list")

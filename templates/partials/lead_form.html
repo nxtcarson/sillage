@@ -1,5 +1,48 @@
-<form method="post" action="{% url 'lead_create' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Add Lead</button>
-</form>
+{% extends "base.html" %}
+{% block page_title %}Add Lead{% endblock %}
+{% block content %}
+<div class="max-w-xl">
+  <div class="card p-6">
+    <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-6">New Lead</h2>
+    <form method="post" action="{% url 'lead_create' %}" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label for="id_contact" class="form-label">Contact <span class="text-red-400">*</span></label>
+        {{ form.contact }}
+        {% for e in form.contact.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="id_stage" class="form-label">Pipeline stage <span class="text-red-400">*</span></label>
+        {{ form.stage }}
+        {% for e in form.stage.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label for="id_value" class="form-label">Deal value ($)</label>
+          {{ form.value }}
+          {% for e in form.value.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="id_probability" class="form-label">Probability (%)</label>
+          {{ form.probability }}
+          {% for e in form.probability.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+      </div>
+      <div>
+        <label for="id_expected_close" class="form-label">Expected close date</label>
+        {{ form.expected_close }}
+        {% for e in form.expected_close.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label for="id_notes" class="form-label">Notes</label>
+        {{ form.notes }}
+        {% for e in form.notes.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary">Add Lead</button>
+        <a href="{% url 'pipeline' %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

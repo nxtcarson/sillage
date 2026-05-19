@@ -22,49 +22,52 @@
   </div>
   {% endif %}
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="card p-5 flex items-center justify-between gap-4">
-      <div>
-        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Contacts</p>
-        <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">{{ contacts_count }}</p>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="stat-card">
+      <div class="min-w-0">
+        <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 truncate">Contacts</p>
+        <p class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">{{ contacts_count }}</p>
       </div>
-      <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
-      </div>
-    </div>
-    <div class="card p-5 flex items-center justify-between gap-4">
-      <div>
-        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Active Policies</p>
-        <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">{{ active_policies }}</p>
-      </div>
-      <div class="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
+      <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
       </div>
     </div>
-    <div class="card p-5 flex items-center justify-between gap-4">
-      <div>
-        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Revenue</p>
-        <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">${{ revenue|floatformat:0 }}</p>
+    <div class="stat-card">
+      <div class="min-w-0">
+        <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 truncate">Policies</p>
+        <p class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">{{ active_policies }}</p>
       </div>
-      <div class="w-12 h-12 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center shrink-0">
-        <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+      <div class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
       </div>
     </div>
-    <div class="card p-5 flex items-center justify-between gap-4">
-      <div>
-        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Conversion</p>
-        <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">{{ conversion|floatformat:1 }}%</p>
+    <div class="stat-card">
+      <div class="min-w-0">
+        <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 truncate">Revenue</p>
+        <p class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">${{ revenue|floatformat:0 }}</p>
       </div>
-      <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-        <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
+      <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="min-w-0">
+        <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 truncate">Conversion</p>
+        <p class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tabular-nums">{{ conversion|floatformat:1 }}%</p>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/></svg>
       </div>
     </div>
   </div>
 
   <div class="grid lg:grid-cols-2 gap-6">
     <div class="card p-5">
-      <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Pipeline Overview</h3>
-      <canvas id="pipelineChart" height="200"></canvas>
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Pipeline Overview</h3>
+        <a href="{% url 'pipeline' %}" class="text-xs text-brand-600 dark:text-brand-400 hover:underline font-medium">View pipeline</a>
+      </div>
+      <div id="pipeline-overview" class="space-y-4 min-h-[180px]"></div>
     </div>
     <div class="card p-5">
       <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Recent Activity</h3>
@@ -146,57 +149,30 @@
   </div>
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const ctx = document.getElementById('pipelineChart');
-  if (!ctx) return;
+(function() {
   const data = {{ pipeline_data_json|safe }};
-  const isDark = document.documentElement.classList.contains('dark');
-  const gridColor = isDark ? 'rgba(148,163,184,0.1)' : 'rgba(148,163,184,0.2)';
-  const labelColor = isDark ? '#94a3b8' : '#64748b';
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: data.map(d => d.name),
-      datasets: [{
-        label: 'Leads',
-        data: data.map(d => d.count),
-        backgroundColor: 'rgba(189,86,42,0.75)',
-        borderRadius: 4,
-        yAxisID: 'yCount',
-        order: 1,
-      }, {
-        label: 'Value ($)',
-        data: data.map(d => d.value),
-        backgroundColor: 'rgba(34,197,94,0.65)',
-        borderRadius: 4,
-        yAxisID: 'yValue',
-        order: 2,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'bottom', labels: { color: labelColor, boxRadius: 3, padding: 16, font: { size: 12 } } }
-      },
-      scales: {
-        x: { ticks: { color: labelColor }, grid: { color: gridColor } },
-        yCount: {
-          type: 'linear', position: 'left', beginAtZero: true,
-          ticks: { stepSize: 1, color: labelColor },
-          grid: { color: gridColor },
-          title: { display: true, text: 'Leads', color: labelColor },
-        },
-        yValue: {
-          type: 'linear', position: 'right', beginAtZero: true,
-          grid: { drawOnChartArea: false },
-          ticks: { callback: (v) => '$' + v.toLocaleString(), color: labelColor },
-          title: { display: true, text: 'Value ($)', color: labelColor },
-        },
-      },
-    }
-  });
-});
+  const el = document.getElementById('pipeline-overview');
+  if (!el) return;
+  if (!data || !data.length) {
+    el.innerHTML = '<p class="text-sm text-slate-400 text-center py-10">No pipeline stages yet.</p>';
+    return;
+  }
+  const maxCount = Math.max(...data.map(d => d.count), 1);
+  el.innerHTML = data.map(stage => {
+    const pct = Math.max(Math.round((stage.count / maxCount) * 100), stage.count > 0 ? 3 : 0);
+    const valStr = stage.value > 0 ? '$' + stage.value.toLocaleString() : '';
+    return `<div class="flex items-center gap-3 min-w-0">
+      <span class="w-28 sm:w-36 shrink-0 text-sm text-slate-600 dark:text-slate-400 truncate">${stage.name}</span>
+      <div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden min-w-0">
+        <div class="h-full rounded-full transition-all duration-500" style="width:${pct}%;background-color:${stage.color||'#94a3b8'}"></div>
+      </div>
+      <div class="shrink-0 flex items-center gap-2 text-xs tabular-nums text-right">
+        <span class="font-medium text-slate-700 dark:text-slate-300 w-6 text-right">${stage.count}</span>
+        ${valStr ? `<span class="text-slate-400 dark:text-slate-500 hidden sm:inline">${valStr}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+})();
 </script>
 {% endblock %}

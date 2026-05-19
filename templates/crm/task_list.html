@@ -16,19 +16,20 @@
 </div>
 
 <div class="card overflow-hidden">
+  <div class="overflow-x-auto">
   <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
     <thead class="bg-slate-50 dark:bg-slate-700/50">
       <tr>
         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Task</th>
         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">Contact</th>
-        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Due</th>
+        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Due Date</th>
         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">Assigned</th>
         <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
       {% for task in tasks %}
-      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors {% if task.completed %}opacity-60{% endif %}">
+      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors {% if task.completed %}opacity-60{% elif task.due_date and task.due_date < today %}bg-red-50/40 dark:bg-red-900/10{% endif %}">
         <td class="px-4 py-3">
           <div class="flex items-center gap-3">
             <form method="post" action="{% url 'task_toggle' task.pk %}" class="contents">
@@ -41,7 +42,13 @@
                 {% endif %}
               </button>
             </form>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300 {% if task.completed %}line-through{% endif %}">{{ task.title }}</span>
+            <div class="min-w-0">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-300 {% if task.completed %}line-through{% endif %}">{{ task.title }}</span>
+              <span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide
+                {% if task.priority == 'high' %}bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300
+                {% elif task.priority == 'medium' %}bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300
+                {% else %}bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400{% endif %}">{{ task.priority }}</span>
+            </div>
           </div>
         </td>
         <td class="px-4 py-3 text-sm text-slate-500 hidden sm:table-cell">
@@ -49,7 +56,10 @@
           <a href="{% url 'contact_detail' task.related_contact.pk %}" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors cursor-pointer">{{ task.related_contact.full_name }}</a>
           {% else %}—{% endif %}
         </td>
-        <td class="px-4 py-3 text-sm text-slate-500 hidden md:table-cell">{{ task.due_date|default:"—" }}</td>
+        <td class="px-4 py-3 text-sm hidden md:table-cell {% if not task.completed and task.due_date and task.due_date < today %}text-red-600 dark:text-red-400 font-medium{% else %}text-slate-500{% endif %}">
+          {{ task.due_date|default:"—" }}
+          {% if not task.completed and task.due_date and task.due_date < today %}<span class="ml-1 text-[10px] font-semibold uppercase tracking-wide">Overdue</span>{% endif %}
+        </td>
         <td class="px-4 py-3 text-sm text-slate-500 hidden lg:table-cell">{{ task.assigned_to.name|default:"—" }}</td>
         <td class="px-4 py-3 text-right">
           <a href="{% url 'task_edit' task.pk %}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline font-medium cursor-pointer">Edit</a>
@@ -69,6 +79,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% if tasks.has_other_pages %}
   <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-sm">
     {% if tasks.has_previous %}

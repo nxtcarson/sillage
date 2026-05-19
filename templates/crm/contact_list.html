@@ -28,6 +28,7 @@
 </div>
 
 <div class="card overflow-hidden">
+  <div class="overflow-x-auto">
   <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
     <thead class="bg-slate-50 dark:bg-slate-700/50">
       <tr>
@@ -69,6 +70,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% if contacts.has_other_pages %}
   <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-sm">
     {% if contacts.has_previous %}

@@ -13,4 +13,17 @@ document.addEventListener('DOMContentLoaded', function() {
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
   }
+
+  const msgEl = document.getElementById('django-messages');
+  if (msgEl) {
+    try {
+      const messages = JSON.parse(msgEl.textContent || '[]');
+      messages.forEach(function(m) {
+        const type = m.tags.includes('error') ? 'error' : m.tags.includes('warning') ? 'info' : 'success';
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: m.message, type: type }
+        }));
+      });
+    } catch(e) {}
+  }
 });

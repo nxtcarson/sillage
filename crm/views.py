@@ -5,9 +5,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 import json
-from core.decorators import require_auth, require_role, require_tier
+from core.decorators import require_auth, require_role
 from .models import Contact, Lead, Policy, PipelineStage, Task, Activity, Automation
 from .forms import ContactForm, LeadForm, PolicyForm, TaskForm, ActivityForm, AutomationForm
 from .automations import fire_lead_stage_automations
@@ -38,7 +39,7 @@ def dashboard(request):
     for stage in PipelineStage.objects.filter(organization=org).order_by("order"):
         count = Lead.objects.filter(stage=stage).count()
         value = Lead.objects.filter(stage=stage).aggregate(Sum("value"))["value__sum"] or 0
-        pipeline_data.append({"name": stage.name, "count": count, "value": float(value)})
+        pipeline_data.append({"name": stage.name, "count": count, "value": float(value), "color": stage.color or "#94a3b8"})
     activities = Activity.objects.filter(organization=org).select_related("contact", "user").order_by("-timestamp")[:15]
     upcoming_tasks = Task.objects.filter(organization=org, completed=False, due_date__gte=timezone.now().date()).order_by("due_date")[:10]
     renewals = Policy.objects.filter(organization=org, status="active", expiry_date__gte=timezone.now().date(), expiry_date__lte=timezone.now().date() + timedelta(days=30)).order_by("expiry_date")[:5]
@@ -302,7 +303,7 @@ def task_list(request):
         qs = qs.filter(completed=False)
     paginator = Paginator(qs, 20)
     page = paginator.get_page(request.GET.get("page", 1))
-    return render(request, "crm/task_list.html", {"tasks": page, "completed_filter": completed})
+    return render(request, "crm/task_list.html", {"tasks": page, "completed_filter": completed, "today": timezone.now().date()})
 
 
 @require_auth
@@ -423,7 +424,6 @@ def lead_move(request, pk):
 
 
 @require_auth
-@require_tier("standard", "pro")
 @require_role("owner", "admin", "agent")
 def automation_list(request):
     org = _get_org(request)
@@ -434,7 +434,6 @@ def automation_list(request):
 
 
 @require_auth
-@require_tier("standard", "pro")
 @require_role("owner", "admin", "agent")
 def automation_create(request):
     org = _get_org(request)
@@ -453,7 +452,6 @@ def automation_create(request):
 
 
 @require_auth
-@require_tier("standard", "pro")
 @require_role("owner", "admin", "agent")
 def automation_edit(request, pk):
     org = _get_org(request)
@@ -472,7 +470,6 @@ def automation_edit(request, pk):
 
 
 @require_auth
-@require_tier("standard", "pro")
 @require_role("owner", "admin", "agent")
 @require_http_methods(["POST"])
 def automation_delete(request, pk):
@@ -485,7 +482,6 @@ def automation_delete(request, pk):
 
 
 @require_auth
-@require_tier("standard", "pro")
 @require_role("owner", "admin", "agent")
 @require_http_methods(["POST"])
 def automation_toggle(request, pk):

@@ -1,35 +1,67 @@
 {% extends "base.html" %}
 {% block page_title %}Calendar{% endblock %}
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
-  <h2 class="text-xl font-semibold">Calendar</h2>
-  <div class="flex gap-2 items-center">
-    <a href="?year={{ prev_year }}&month={{ prev_month }}" class="px-3 py-1 border rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Prev</a>
-    <span class="font-medium">{{ month }}/{{ year }}</span>
-    <a href="?year={{ next_year }}&month={{ next_month }}" class="px-3 py-1 border rounded hover:bg-slate-100 dark:hover:bg-slate-700 dark:border-slate-600">Next</a>
+<div class="page-header">
+  <h2 class="text-xl font-semibold text-slate-900 dark:text-white">{{ month_name }} {{ year }}</h2>
+  <div class="flex items-center gap-2">
+    <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn-secondary py-1.5 px-3 cursor-pointer" aria-label="Previous month">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+    </a>
+    <a href="?year={{ next_year }}&month={{ next_month }}" class="btn-secondary py-1.5 px-3 cursor-pointer" aria-label="Next month">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+    </a>
+    <a href="{% url 'task_create' %}" class="btn-primary ml-1 cursor-pointer">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+      Add Task
+    </a>
   </div>
 </div>
-<div class="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
-  <div class="grid grid-cols-7 border-b border-slate-200 dark:border-slate-700">
-    <div class="p-2 text-center text-sm font-medium text-slate-500">Sun</div>
-    <div class="p-2 text-center text-sm font-medium text-slate-500">Mon</div>
-    <div class="p-2 text-center text-sm font-medium text-slate-500">Tue</div>
-    <div class="p-2 text-center text-sm font-medium text-slate-500">Wed</div>
-    <div class="p-2 text-center text-sm font-medium text-slate-500">Thu</div>
-    <div class="p-2 text-center text-sm font-medium text-slate-500">Fri</div>
-    <div class="p-2 text-center text-sm font-medium text-slate-500">Sat</div>
+
+<div class="card overflow-hidden">
+  <div class="grid grid-cols-7 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
+    <div class="py-2.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sun</div>
+    <div class="py-2.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mon</div>
+    <div class="py-2.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tue</div>
+    <div class="py-2.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Wed</div>
+    <div class="py-2.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Thu</div>
+    <div class="py-2.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fri</div>
+    <div class="py-2.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sat</div>
   </div>
+
   {% for week in weeks %}
-  <div class="grid grid-cols-7 border-b border-slate-100 dark:border-slate-700 last:border-0">
+  <div class="grid grid-cols-7 border-b border-slate-100 dark:border-slate-700/60 last:border-0">
     {% for cell in week %}
-    <div class="min-h-[80px] p-2 border-r border-slate-100 dark:border-slate-700 last:border-r-0 {% if cell.day.month != month %}bg-slate-50 dark:bg-slate-800/50 text-slate-400{% endif %}">
-      <span class="text-sm">{{ cell.day.day }}</span>
-      {% for event in cell.events %}
-      <a href="{{ event.url }}" class="block text-xs mt-1 p-1 rounded bg-brand-100 dark:bg-brand-900/50 truncate">{{ event.title }}</a>
-      {% endfor %}
+    <div class="min-h-[90px] sm:min-h-[110px] p-1.5 border-r border-slate-100 dark:border-slate-700/60 last:border-r-0 {% if cell.day.month != month %}bg-slate-50/70 dark:bg-slate-800/30{% endif %}">
+      <span class="inline-flex items-center justify-center w-7 h-7 text-sm rounded-full mb-1 font-medium
+        {% if cell.day == today %}bg-brand-600 text-white
+        {% elif cell.day.month != month %}text-slate-300 dark:text-slate-600
+        {% else %}text-slate-700 dark:text-slate-200{% endif %}">{{ cell.day.day }}</span>
+      <div class="space-y-0.5">
+        {% for event in cell.events %}
+        <a href="{{ event.url }}" class="flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded font-medium truncate cursor-pointer transition-colors duration-150
+          {% if event.type == 'task' %}bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/60
+          {% else %}bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800/60{% endif %}">
+          {% if event.type == 'task' %}
+          <svg class="w-2.5 h-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+          {% else %}
+          <svg class="w-2.5 h-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126Z"/></svg>
+          {% endif %}
+          <span class="truncate">{{ event.title }}</span>
+        </a>
+        {% endfor %}
+      </div>
     </div>
     {% endfor %}
   </div>
   {% endfor %}
+</div>
+
+<div class="flex items-center gap-5 mt-3 text-xs text-slate-500 dark:text-slate-400">
+  <span class="flex items-center gap-1.5">
+    <span class="w-3 h-3 rounded bg-blue-100 dark:bg-blue-900/40 inline-block shrink-0"></span>Tasks
+  </span>
+  <span class="flex items-center gap-1.5">
+    <span class="w-3 h-3 rounded bg-amber-100 dark:bg-amber-900/40 inline-block shrink-0"></span>Renewals
+  </span>
 </div>
 {% endblock %}

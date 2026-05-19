@@ -1,7 +1,18 @@
 <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-  <td class="px-4 py-3"><a href="{{ doc.firebase_storage_url }}" target="_blank" class="text-brand-600">{{ doc.name }}</a></td>
-  <td class="px-4 py-3">{% if doc.contact %}{{ doc.contact.full_name }}{% else %}-{% endif %}</td>
-  <td class="px-4 py-3">{% if doc.policy %}{{ doc.policy.policy_number|default:"-" }}{% else %}-{% endif %}</td>
-  <td class="px-4 py-3">{{ doc.uploaded_at|date:"M d, Y" }}</td>
-  <td class="px-4 py-3 text-right"><a href="{{ doc.firebase_storage_url }}" target="_blank" class="text-brand-600 text-sm">Download</a></td>
+  <td class="px-4 py-3">
+    {% if doc.download_url %}
+    <a href="{{ doc.download_url }}" target="_blank" rel="noopener" class="text-brand-600 dark:text-brand-400 hover:underline">{{ doc.name }}</a>
+    {% else %}
+    {{ doc.name }}
+    {% endif %}
+  </td>
+  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{% if doc.contact %}<a href="{% url 'contact_detail' doc.contact.pk %}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ doc.contact.full_name }}</a>{% else %}—{% endif %}</td>
+  <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{% if doc.policy %}{{ doc.policy.policy_number|default:"—" }}{% else %}—{% endif %}</td>
+  <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ doc.uploaded_at|date:"M d, Y" }}</td>
+  <td class="px-4 py-3 text-right text-sm">
+    {% if doc.download_url %}
+    <a href="{{ doc.download_url }}" target="_blank" rel="noopener" class="text-brand-600 dark:text-brand-400 hover:underline cursor-pointer">Download</a>
+    {% endif %}
+    <form method="post" action="{% url 'document_delete' doc.pk %}" class="inline ml-2" onsubmit="return confirm('Delete this document?')">{% csrf_token %}<button type="submit" class="text-red-600 dark:text-red-400 hover:underline cursor-pointer">Delete</button></form>
+  </td>
 </tr>

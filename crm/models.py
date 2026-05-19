@@ -150,7 +150,8 @@ class Document(models.Model):
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE, null=True, blank=True, related_name="documents")
     policy = models.ForeignKey(Policy, on_delete=models.CASCADE, null=True, blank=True, related_name="documents")
     name = models.CharField(max_length=255)
-    firebase_storage_url = models.URLField(max_length=500)
+    file = models.FileField(upload_to="documents/%Y/%m/", blank=True)
+    firebase_storage_url = models.URLField(max_length=500, blank=True)
     uploaded_by = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name="uploaded_documents")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
@@ -159,6 +160,12 @@ class Document(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def download_url(self):
+        if self.file:
+            return self.file.url
+        return self.firebase_storage_url or ""
 
 
 class Automation(models.Model):
