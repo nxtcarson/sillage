@@ -1,3 +1,7 @@
 Django>=5.0
 stripe
 python-dotenv
+djangorestframework
+django-cors-headers
+dj-rest-auth
+django-allauth
