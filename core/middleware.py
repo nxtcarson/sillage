@@ -34,7 +34,7 @@ class FirebaseAuthMiddleware:
     def __call__(self, request):
         if _is_public(request.path):
             return self.get_response(request)
-        if request.path.startswith("/static/") or request.path.startswith("/admin/"):
+        if request.path.startswith("/static/") or request.path.startswith("/admin/") or request.path.startswith("/api/"):
             return self.get_response(request)
         if request.session.get("user_id"):
             try:

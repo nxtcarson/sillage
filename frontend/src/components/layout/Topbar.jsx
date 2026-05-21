@@ -11,14 +11,16 @@ import {
   Menu,
   MenuItem,
   SvgIcon,
+  Typography,
 } from '@mui/material';
 import { useColorMode } from '../../App';
+import { useAuth } from '../../context/AuthContext';
 
 const BRAND = '#BD562A';
 
 function SearchIcon() {
   return (
-    <SvgIcon sx={{ fontSize: 16, color: 'text.disabled' }}>
+    <SvgIcon sx={{ fontSize: 15, color: '#475569' }}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -41,7 +43,7 @@ function MenuIcon() {
 
 function SunIcon() {
   return (
-    <SvgIcon sx={{ fontSize: 20 }}>
+    <SvgIcon sx={{ fontSize: 18 }}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -56,7 +58,7 @@ function SunIcon() {
 
 function MoonIcon() {
   return (
-    <SvgIcon sx={{ fontSize: 20 }}>
+    <SvgIcon sx={{ fontSize: 18 }}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -71,7 +73,7 @@ function MoonIcon() {
 
 function PlusIcon() {
   return (
-    <SvgIcon sx={{ fontSize: 16 }}>
+    <SvgIcon sx={{ fontSize: 14 }}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" fill="none" stroke="currentColor" strokeWidth="2.5" />
     </SvgIcon>
   );
@@ -79,27 +81,34 @@ function PlusIcon() {
 
 export default function Topbar({ onMenuToggle }) {
   const { mode, toggle: toggleTheme } = useColorMode();
+  const { user, org, logout } = useAuth() ?? {};
   const [anchorEl, setAnchorEl] = useState(null);
+  const [avatarAnchor, setAvatarAnchor] = useState(null);
+
+  const avatarLetter = user?.name
+    ? user.name.charAt(0).toUpperCase()
+    : user?.email
+    ? user.email.charAt(0).toUpperCase()
+    : 'U';
 
   return (
     <AppBar
       position="sticky"
       elevation={0}
       sx={{
-        bgcolor: 'background.paper',
-        borderBottom: 1,
-        borderColor: 'divider',
+        bgcolor: '#0F172A',
+        borderBottom: '1px solid rgba(189,86,42,0.1)',
         color: 'text.primary',
-        height: 64,
+        height: 56,
         justifyContent: 'center',
         zIndex: (t) => t.zIndex.drawer - 1,
       }}
     >
-      <Toolbar sx={{ gap: 1.5, minHeight: '64px !important', px: { xs: 2, md: 3 } }}>
+      <Toolbar sx={{ gap: 1.5, minHeight: '56px !important', px: { xs: 2, md: 3 } }}>
         <IconButton
           onClick={onMenuToggle}
           size="small"
-          sx={{ display: { md: 'none' }, mr: 0.5 }}
+          sx={{ display: { md: 'none' }, mr: 0.5, color: '#94A3B8' }}
           aria-label="Open menu"
         >
           <MenuIcon />
@@ -110,18 +119,17 @@ export default function Topbar({ onMenuToggle }) {
             display: { xs: 'none', md: 'flex' },
             alignItems: 'center',
             gap: 1,
-            bgcolor: 'action.hover',
-            borderRadius: 2,
-            px: 1.5,
-            py: 0.75,
-            minWidth: 220,
+            borderBottom: '1px solid #334155',
+            px: 0.5,
+            py: 0.5,
+            minWidth: 200,
           }}
         >
           <SearchIcon />
           <InputBase
             placeholder="Search…"
             inputProps={{ 'aria-label': 'search' }}
-            sx={{ fontSize: 14, flex: 1, color: 'text.primary' }}
+            sx={{ fontSize: 13, flex: 1, color: '#94A3B8' }}
           />
         </Box>
 
@@ -135,10 +143,12 @@ export default function Topbar({ onMenuToggle }) {
           sx={{
             bgcolor: BRAND,
             '&:hover': { bgcolor: '#a84a24' },
-            borderRadius: 2,
+            borderRadius: 0,
             textTransform: 'none',
             fontWeight: 600,
-            px: 2,
+            fontSize: 13,
+            px: 1.75,
+            py: 0.625,
             display: { xs: 'none', sm: 'flex' },
           }}
         >
@@ -152,26 +162,56 @@ export default function Topbar({ onMenuToggle }) {
         </Menu>
 
         <Tooltip title="Toggle theme">
-          <IconButton onClick={toggleTheme} size="small" sx={{ color: 'text.secondary' }}>
+          <IconButton onClick={toggleTheme} size="small" sx={{ color: '#64748B' }}>
             {mode === 'dark' ? <SunIcon /> : <MoonIcon />}
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Account">
-          <Avatar
+        {org?.name && (
+          <Typography
             sx={{
-              width: 32,
-              height: 32,
-              fontSize: 13,
-              fontWeight: 700,
-              bgcolor: '#f3ddd5',
-              color: BRAND,
-              cursor: 'pointer',
+              fontFamily: '"Montserrat", sans-serif',
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#64748B',
+              display: { xs: 'none', sm: 'block' },
+              maxWidth: 140,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            U
+            {org.name}
+          </Typography>
+        )}
+
+        <Tooltip title={user?.name || user?.email || 'Account'}>
+          <Avatar
+            onClick={(e) => setAvatarAnchor(e.currentTarget)}
+            sx={{
+              width: 30,
+              height: 30,
+              fontSize: 12,
+              fontWeight: 700,
+              bgcolor: 'rgba(189,86,42,0.15)',
+              color: BRAND,
+              cursor: 'pointer',
+              borderRadius: 0,
+            }}
+          >
+            {avatarLetter}
           </Avatar>
         </Tooltip>
+        <Menu anchorEl={avatarAnchor} open={Boolean(avatarAnchor)} onClose={() => setAvatarAnchor(null)}>
+          {user?.name && (
+            <MenuItem disabled sx={{ fontWeight: 600, opacity: '1 !important' }}>
+              {user.name}
+            </MenuItem>
+          )}
+          <MenuItem onClick={() => { setAvatarAnchor(null); logout?.(); }}>Sign out</MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );

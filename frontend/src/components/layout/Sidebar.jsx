@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -8,7 +7,6 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  Divider,
   SvgIcon,
 } from '@mui/material';
 
@@ -17,7 +15,7 @@ const DRAWER_WIDTH = 256;
 
 function NavIcon({ d }) {
   return (
-    <SvgIcon sx={{ fontSize: 20 }}>
+    <SvgIcon sx={{ fontSize: 18 }}>
       <path strokeLinecap="round" strokeLinejoin="round" d={d} fill="none" stroke="currentColor" strokeWidth="1.5" />
     </SvgIcon>
   );
@@ -107,35 +105,58 @@ const SETTINGS_NAV = [
 
 function NavItem({ label, to, iconD, onClick }) {
   return (
-    <ListItem disablePadding sx={{ mb: 0.25 }}>
+    <ListItem disablePadding sx={{ mb: 0.125 }}>
       <ListItemButton
         component={NavLink}
         to={to}
         onClick={onClick}
         sx={{
-          borderRadius: 2,
+          borderRadius: 0,
+          borderLeft: '3px solid transparent',
           px: 1.5,
-          py: 0.875,
-          color: 'text.secondary',
+          py: 0.75,
+          color: '#64748B',
+          transition: 'color 0.15s, border-color 0.15s',
           '&.active': {
-            bgcolor: 'action.selected',
+            borderLeftColor: BRAND,
             color: BRAND,
+            bgcolor: 'transparent',
             '& .MuiListItemIcon-root': { color: BRAND },
           },
           '&:hover': {
-            bgcolor: 'action.hover',
+            bgcolor: 'rgba(255,255,255,0.04)',
+            color: '#94A3B8',
           },
         }}
       >
-        <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
+        <ListItemIcon sx={{ minWidth: 34, color: 'inherit' }}>
           <NavIcon d={iconD} />
         </ListItemIcon>
         <ListItemText
           primary={label}
-          primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+          primaryTypographyProps={{ fontSize: 13, fontWeight: 500, letterSpacing: '0.01em' }}
         />
       </ListItemButton>
     </ListItem>
+  );
+}
+
+function GeometricDivider() {
+  return (
+    <Box sx={{ position: 'relative', my: 2, mx: 1.5 }}>
+      <Box sx={{ height: 1, bgcolor: 'rgba(189,86,42,0.2)' }} />
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%) rotate(45deg)',
+          width: 5,
+          height: 5,
+          bgcolor: BRAND,
+        }}
+      />
+    </Box>
   );
 }
 
@@ -153,55 +174,62 @@ export default function Sidebar({ onClose }) {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        borderRight: 1,
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
+        borderRight: '1px solid rgba(189,86,42,0.12)',
+        bgcolor: '#0F172A',
       }}
     >
       <Box
         sx={{
-          height: 64,
+          height: 56,
           px: 2.5,
           display: 'flex',
           alignItems: 'center',
-          borderBottom: 1,
-          borderColor: 'divider',
+          borderBottom: '1px solid rgba(189,86,42,0.12)',
           flexShrink: 0,
         }}
       >
-        <NavLink to="/app/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <NavLink to="/app/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
           <Box
-            component="span"
+            component="img"
+            src="/img/sillage-logo.svg"
+            alt="Sillage"
+            sx={{ width: 26, height: 26 }}
+          />
+          <Typography
             sx={{
-              width: 28,
-              height: 28,
-              borderRadius: 1.5,
-              bgcolor: BRAND,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              fontFamily: '"Fraunces", serif',
+              fontWeight: 700,
+              fontSize: 17,
+              color: '#F1F5F9',
+              letterSpacing: '-0.01em',
             }}
           >
-            <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 13 }}>S</Typography>
-          </Box>
-          <Typography sx={{ fontWeight: 700, fontSize: 18, color: BRAND, letterSpacing: '-0.01em' }}>
             Sillage
           </Typography>
         </NavLink>
       </Box>
 
-      <Box component="nav" sx={{ flex: 1, overflowY: 'auto', px: 1.5, py: 2 }}>
+      <Box component="nav" sx={{ flex: 1, overflowY: 'auto', px: 0, py: 1.5 }}>
         <List disablePadding>
           {PRIMARY_NAV.map((item) => (
             <NavItem key={item.to} {...item} onClick={onClose} />
           ))}
         </List>
 
-        <Divider sx={{ my: 1.5 }} />
+        <GeometricDivider />
 
         <Typography
           variant="caption"
-          sx={{ px: 1.5, mb: 0.75, display: 'block', fontWeight: 600, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.06em' }}
+          sx={{
+            px: 1.75,
+            mb: 0.5,
+            display: 'block',
+            fontWeight: 600,
+            color: '#475569',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            fontSize: 10,
+          }}
         >
           Settings
         </Typography>
@@ -212,19 +240,27 @@ export default function Sidebar({ onClose }) {
         </List>
       </Box>
 
-      <Box sx={{ px: 1.5, py: 1.5, borderTop: 1, borderColor: 'divider', flexShrink: 0 }}>
+      <Box
+        sx={{
+          px: 0,
+          py: 1,
+          borderTop: '1px solid rgba(189,86,42,0.12)',
+          flexShrink: 0,
+        }}
+      >
         <ListItemButton
           onClick={handleLogout}
           sx={{
-            borderRadius: 2,
+            borderRadius: 0,
+            borderLeft: '3px solid transparent',
             px: 1.5,
-            py: 0.875,
-            color: 'error.main',
-            '&:hover': { bgcolor: 'error.lighter' },
+            py: 0.75,
+            color: '#EF4444',
+            '&:hover': { bgcolor: 'rgba(239,68,68,0.06)' },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
-            <SvgIcon sx={{ fontSize: 20 }}>
+          <ListItemIcon sx={{ minWidth: 34, color: 'inherit' }}>
+            <SvgIcon sx={{ fontSize: 18 }}>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -235,7 +271,7 @@ export default function Sidebar({ onClose }) {
               />
             </SvgIcon>
           </ListItemIcon>
-          <ListItemText primary="Log out" primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }} />
+          <ListItemText primary="Log out" primaryTypographyProps={{ fontSize: 13, fontWeight: 500 }} />
         </ListItemButton>
       </Box>
     </Box>

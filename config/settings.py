@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "dj_rest_auth.registration",
     "core",
-    "accounts",
+    "accounts.apps.AccountsConfig",
     "crm",
     "boards",
     "billing",
@@ -138,6 +138,16 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
 
 CORS_ALLOW_CREDENTIALS = True
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
 ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_UNIQUE_EMAIL = True
+
+REST_AUTH = {
+    "REGISTER_SERIALIZER": "accounts.serializers.EmailOnlyRegisterSerializer",
+}

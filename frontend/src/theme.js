@@ -15,7 +15,7 @@ export function buildTheme(mode) {
         contrastText: '#ffffff',
       },
       background: {
-        default: dark ? '#0F172A' : '#ffffff',
+        default: dark ? '#111827' : '#ffffff',
         paper: dark ? '#1E293B' : '#ffffff',
       },
       text: {
@@ -30,15 +30,27 @@ export function buildTheme(mode) {
       h2: { fontFamily: '"Playfair Display", serif', fontWeight: 700 },
       h3: { fontFamily: '"Playfair Display", serif', fontWeight: 600 },
       h4: { fontFamily: '"Playfair Display", serif', fontWeight: 700 },
+      h5: {
+        fontFamily: '"Montserrat", sans-serif',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        fontWeight: 600,
+      },
+      h6: {
+        fontFamily: '"Montserrat", sans-serif',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        fontWeight: 600,
+      },
     },
-    shape: { borderRadius: 10 },
+    shape: { borderRadius: 2 },
     components: {
       MuiButton: {
         styleOverrides: {
           root: {
             textTransform: 'none',
             fontWeight: 600,
-            borderRadius: 8,
+            borderRadius: 2,
           },
           containedPrimary: {
             backgroundColor: brandOrange,
@@ -59,6 +71,7 @@ export function buildTheme(mode) {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
+            borderRadius: 0,
           },
         },
       },
@@ -66,6 +79,36 @@ export function buildTheme(mode) {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
+            borderRadius: 0,
+          },
+        },
+      },
+      MuiDivider: {
+        styleOverrides: {
+          root: {
+            borderColor: dark ? '#334155' : '#E2E8F0',
+          },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            padding: '8px 16px',
+            borderColor: dark ? '#334155' : '#E2E8F0',
+          },
+          head: {
+            fontSize: 11,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.07em',
+            color: dark ? '#94A3B8' : '#475569',
+          },
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            '&:last-child td': { borderBottom: 0 },
           },
         },
       },

@@ -1,5 +1,4 @@
-import { Box, Button, Card, CardActionArea, CardContent, Grid, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Box, Button, Grid, Typography } from '@mui/material';
 import PageHeader from '../../components/ui/PageHeader';
 
 export default function BoardsPage() {
@@ -11,7 +10,7 @@ export default function BoardsPage() {
         action={
           <Button
             variant="contained"
-            sx={{ bgcolor: 'primary.main', textTransform: 'none', borderRadius: 2, fontWeight: 600 }}
+            sx={{ bgcolor: 'primary.main', borderRadius: 0, fontWeight: 600 }}
           >
             New board
           </Button>
@@ -25,10 +24,9 @@ export default function BoardsPage() {
               alignItems: 'center',
               justifyContent: 'center',
               minHeight: 320,
-              border: 2,
-              borderStyle: 'dashed',
-              borderColor: 'divider',
-              borderRadius: 3,
+              border: '1px dashed',
+              borderColor: 'rgba(189,86,42,0.2)',
+              borderRadius: 0,
               color: 'text.disabled',
               flexDirection: 'column',
               gap: 1,

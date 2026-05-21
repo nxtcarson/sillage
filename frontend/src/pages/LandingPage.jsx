@@ -433,9 +433,7 @@ export default function LandingPage() {
       }}>
         <Box sx={{ px: { xs: 2, sm: 3 }, py: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box component="a" href="/" sx={{ display: 'flex', alignItems: 'center', gap: 1.25, textDecoration: 'none' }}>
-            <Box sx={{ width: 28, height: 28, borderRadius: 1, bgcolor: BRAND, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <BoltIcon sx={{ color: '#fff', fontSize: 18 }} />
-            </Box>
+            <Box component="img" src="/img/sillage-logo.svg" alt="Sillage" sx={{ width: 32, height: 32 }} />
             <Typography variant="subtitle1" fontWeight={700} sx={{ color: BRAND, fontFamily: '"Fraunces", serif' }}>Sillage</Typography>
           </Box>
 
@@ -454,11 +452,11 @@ export default function LandingPage() {
               {mode === 'dark' ? <Brightness7Icon fontSize="small" /> : <Brightness4Icon fontSize="small" />}
             </IconButton>
             {isMd && (
-              <Button size="small" href="http://localhost:8001/login/" sx={{ color: 'text.secondary', '&:hover': { color: BRAND } }}>
+              <Button size="small" href="/login" sx={{ color: 'text.secondary', '&:hover': { color: BRAND } }}>
                 Log in
               </Button>
             )}
-            <Button variant="contained" color="primary" size="small" href="http://localhost:8001/signup/">
+            <Button variant="contained" color="primary" size="small" href="/signup">
               Sign up free
             </Button>
             {!isMd && (
@@ -485,12 +483,12 @@ export default function LandingPage() {
               </ListItem>
             ))}
             <ListItem disablePadding>
-              <ListItemButton component="a" href="http://localhost:8001/login/">
+              <ListItemButton component="a" href="/login">
                 <ListItemText primary="Log in" />
               </ListItemButton>
             </ListItem>
           </List>
-          <Button fullWidth variant="contained" color="primary" href="http://localhost:8001/signup/" sx={{ mt: 2 }}>
+          <Button fullWidth variant="contained" color="primary" href="/signup" sx={{ mt: 2 }}>
             Sign up free
           </Button>
         </Box>
@@ -509,16 +507,6 @@ export default function LandingPage() {
             <Grid container spacing={{ xs: 6, lg: 8 }} alignItems="center">
               <Grid item xs={12} lg={6}>
                 <Box sx={{ textAlign: { xs: 'center', lg: 'left' } }}>
-                  <Chip
-                    icon={<BoltIcon sx={{ fontSize: '14px !important', color: `${BRAND} !important` }} />}
-                    label="Built for insurance professionals"
-                    size="small"
-                    sx={{
-                      mb: 3, fontWeight: 600, fontSize: 11,
-                      bgcolor: dark ? 'rgba(189,86,42,0.15)' : 'rgba(253,232,220,0.8)',
-                      color: BRAND, border: '1px solid', borderColor: dark ? 'rgba(189,86,42,0.3)' : 'rgba(189,86,42,0.25)',
-                    }}
-                  />
                   <Typography variant="h1" sx={{ fontSize: { xs: '2.5rem', sm: '3.25rem', md: '4rem', lg: '4.5rem' }, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em', mb: 3 }}>
                     Close more policies.<br />Miss fewer renewals.
                   </Typography>
@@ -531,10 +519,10 @@ export default function LandingPage() {
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, justifyContent: { xs: 'center', lg: 'flex-start' } }}>
-                    <Button variant="contained" color="primary" size="large" href="http://localhost:8001/signup/" sx={{ px: 4, py: 1.5 }}>
+                    <Button variant="contained" color="primary" size="large" href="/signup" sx={{ px: 4, py: 1.5 }}>
                       Get started free
                     </Button>
-                    <Button variant="outlined" size="large" href="http://localhost:8001/pricing/" sx={{ px: 4, py: 1.5 }}>
+                    <Button variant="outlined" size="large" href="/app/billing" sx={{ px: 4, py: 1.5 }}>
                       View pricing
                     </Button>
                   </Box>
@@ -590,7 +578,7 @@ export default function LandingPage() {
                 desc="Visual pipeline stages built for insurance workflows. Move leads with drag-and-drop, automate follow-ups when stages change, and never lose track of a hot prospect."
                 bullets={['Custom stages for your agency workflow', 'Automations trigger tasks on stage change', 'Full activity history on every lead']}
                 cta="Start your pipeline"
-                ctaHref="http://localhost:8001/signup/"
+                ctaHref="/signup"
                 visual={<PipelineMockup />}
                 reverse={false}
               />
@@ -600,7 +588,7 @@ export default function LandingPage() {
                 desc="Track every policy by carrier, type, and status. Built-in renewal reminders and a calendar view keep your book of business organized, so clients stay with you year after year."
                 bullets={['Carrier, type, and status at a glance', 'Renewal alerts before policies lapse', 'Link policies directly to contacts']}
                 cta="Manage policies"
-                ctaHref="http://localhost:8001/signup/"
+                ctaHref="/signup"
                 visual={<RenewalsMockup />}
                 reverse={true}
               />
@@ -624,7 +612,7 @@ export default function LandingPage() {
                 desc="Centralize client info, notes, and history. Assign agents, filter by status, and pull up any contact in seconds."
                 bullets={['Search and filter by status or agent', 'Full activity log on every profile', 'Link policies and tasks to contacts']}
                 cta="Manage contacts"
-                ctaHref="http://localhost:8001/signup/"
+                ctaHref="/signup"
                 visual={<ContactsMockup />}
                 reverse={false}
               />
@@ -634,7 +622,7 @@ export default function LandingPage() {
                 desc="Kanban boards for renewals, onboarding, and custom workflows. Drag cards between columns and keep your team aligned."
                 bullets={['Drag-and-drop cards between stages', 'Link cards to contacts and due dates', 'Multiple boards for different workflows']}
                 cta="Create a board"
-                ctaHref="http://localhost:8001/signup/"
+                ctaHref="/signup"
                 visual={<BoardsMockup />}
                 reverse={true}
               />
@@ -644,7 +632,7 @@ export default function LandingPage() {
                 desc="Schedule meetings, follow-ups, and renewals. Color-coded events keep you ahead of every deadline."
                 bullets={['Monthly and weekly views', 'Renewal dates synced from policies', 'Tasks and meetings in one place']}
                 cta="Open calendar"
-                ctaHref="http://localhost:8001/signup/"
+                ctaHref="/signup"
                 visual={<CalendarMockup />}
                 reverse={false}
               />
@@ -654,7 +642,7 @@ export default function LandingPage() {
                 desc="Log calls, emails, and notes. Assign tasks with due dates and link them to contacts so nothing slips through."
                 bullets={['Check off tasks as you complete them', 'Activity timeline on every contact', 'Automations create tasks on stage change']}
                 cta="Track tasks"
-                ctaHref="http://localhost:8001/signup/"
+                ctaHref="/signup"
                 visual={<TasksMockup />}
                 reverse={true}
               />
@@ -699,7 +687,7 @@ export default function LandingPage() {
               ))}
             </Grid>
             <Box sx={{ textAlign: 'center', mt: 6 }}>
-              <Button variant="contained" color="primary" size="large" href="http://localhost:8001/signup/" sx={{ px: 5, py: 1.5 }}>
+              <Button variant="contained" color="primary" size="large" href="/signup" sx={{ px: 5, py: 1.5 }}>
                 Get started free
               </Button>
             </Box>
@@ -793,7 +781,7 @@ export default function LandingPage() {
                         fullWidth
                         variant={plan.popular ? 'contained' : 'outlined'}
                         color="primary"
-                        href="http://localhost:8001/signup/"
+                        href="/signup"
                       >
                         {plan.name === 'Free' ? 'Get started' : 'Subscribe'}
                       </Button>
@@ -804,7 +792,7 @@ export default function LandingPage() {
             </Grid>
             <Box sx={{ textAlign: 'center', mt: 4 }}>
               <Typography variant="body2">
-                <Box component="a" href="http://localhost:8001/pricing/" sx={{ color: BRAND, fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                <Box component="a" href="/app/billing" sx={{ color: BRAND, fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
                   View full pricing details
                 </Box>
               </Typography>
@@ -830,10 +818,10 @@ export default function LandingPage() {
               Join hundreds of insurance agents who manage their pipeline, policies, and team in one place.
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, justifyContent: 'center' }}>
-              <Button variant="contained" color="primary" size="large" href="http://localhost:8001/signup/" sx={{ px: 5, py: 1.5, fontSize: '1rem' }}>
+              <Button variant="contained" color="primary" size="large" href="/signup" sx={{ px: 5, py: 1.5, fontSize: '1rem' }}>
                 Start free today
               </Button>
-              <Button size="large" href="http://localhost:8001/pricing/" sx={{ px: 5, py: 1.5, fontSize: '1rem', color: '#F1F5F9', border: '1px solid rgba(241,245,249,0.15)', bgcolor: 'rgba(241,245,249,0.05)', '&:hover': { bgcolor: 'rgba(241,245,249,0.1)' } }}>
+              <Button size="large" href="/app/billing" sx={{ px: 5, py: 1.5, fontSize: '1rem', color: '#F1F5F9', border: '1px solid rgba(241,245,249,0.15)', bgcolor: 'rgba(241,245,249,0.05)', '&:hover': { bgcolor: 'rgba(241,245,249,0.1)' } }}>
                 View pricing
               </Button>
             </Box>
@@ -858,9 +846,9 @@ export default function LandingPage() {
               </Typography>
             </Grid>
             {[
-              { heading: 'Product', links: [{ label: 'Features', href: '#features' }, { label: 'Pricing', href: 'http://localhost:8001/pricing/' }, { label: 'Sign up', href: 'http://localhost:8001/signup/' }] },
-              { heading: 'Company', links: [{ label: 'How it works', href: '#how-it-works' }, { label: 'Book a demo', href: 'http://localhost:8001/signup/' }] },
-              { heading: 'Account', links: [{ label: 'Log in', href: 'http://localhost:8001/login/' }, { label: 'Create account', href: 'http://localhost:8001/signup/' }] },
+              { heading: 'Product', links: [{ label: 'Features', href: '#features' }, { label: 'Pricing', href: '/app/billing' }, { label: 'Sign up', href: '/signup' }] },
+              { heading: 'Company', links: [{ label: 'How it works', href: '#how-it-works' }, { label: 'Book a demo', href: '/signup' }] },
+              { heading: 'Account', links: [{ label: 'Log in', href: '/login' }, { label: 'Create account', href: '/signup' }] },
             ].map((col) => (
               <Grid item xs={6} sm={3} lg={3} key={col.heading}>
                 <Typography variant="overline" color="text.disabled" sx={{ fontWeight: 700, letterSpacing: 1, display: 'block', mb: 2 }}>{col.heading}</Typography>
@@ -878,7 +866,7 @@ export default function LandingPage() {
           <Box sx={{ pt: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
             <Typography variant="caption" color="text.disabled">&copy; 2026 Sillage. All rights reserved.</Typography>
             <Box sx={{ display: 'flex', gap: 3 }}>
-              {[{ label: 'Pricing', href: 'http://localhost:8001/pricing/' }, { label: 'Log in', href: 'http://localhost:8001/login/' }, { label: 'Sign up', href: 'http://localhost:8001/signup/' }].map((l) => (
+              {[{ label: 'Pricing', href: '/app/billing' }, { label: 'Log in', href: '/login' }, { label: 'Sign up', href: '/signup' }].map((l) => (
                 <Box key={l.label} component="a" href={l.href} sx={{ color: 'text.disabled', textDecoration: 'none', fontSize: 12, '&:hover': { color: 'text.secondary' } }}>
                   {l.label}
                 </Box>

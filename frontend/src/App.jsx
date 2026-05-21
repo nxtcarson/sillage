@@ -2,6 +2,8 @@ import React, { createContext, useContext, useMemo, useState, useEffect } from '
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { buildTheme } from './theme';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import AppLayout from './components/layout/AppLayout';
 import DashboardPage from './pages/app/DashboardPage';
@@ -56,29 +58,31 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/app" element={<AppLayout />}>
-              <Route index element={<Navigate to="/app/dashboard" replace />} />
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="contacts" element={<ContactsPage />} />
-              <Route path="contacts/:id" element={<ContactDetailPage />} />
-              <Route path="pipeline" element={<PipelinePage />} />
-              <Route path="policies" element={<PoliciesPage />} />
-              <Route path="policies/:id" element={<PolicyDetailPage />} />
-              <Route path="boards" element={<BoardsPage />} />
-              <Route path="boards/:id" element={<BoardDetailPage />} />
-              <Route path="calendar" element={<CalendarPage />} />
-              <Route path="tasks" element={<TasksPage />} />
-              <Route path="documents" element={<DocumentsPage />} />
-              <Route path="billing" element={<BillingPage />} />
-              <Route path="settings/profile" element={<ProfileSettingsPage />} />
-              <Route path="settings/org" element={<OrgSettingsPage />} />
-              <Route path="settings/team" element={<TeamSettingsPage />} />
-            </Route>
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                <Route index element={<Navigate to="/app/dashboard" replace />} />
+                <Route path="dashboard" element={<DashboardPage />} />
+                <Route path="contacts" element={<ContactsPage />} />
+                <Route path="contacts/:id" element={<ContactDetailPage />} />
+                <Route path="pipeline" element={<PipelinePage />} />
+                <Route path="policies" element={<PoliciesPage />} />
+                <Route path="policies/:id" element={<PolicyDetailPage />} />
+                <Route path="boards" element={<BoardsPage />} />
+                <Route path="boards/:id" element={<BoardDetailPage />} />
+                <Route path="calendar" element={<CalendarPage />} />
+                <Route path="tasks" element={<TasksPage />} />
+                <Route path="documents" element={<DocumentsPage />} />
+                <Route path="billing" element={<BillingPage />} />
+                <Route path="settings/profile" element={<ProfileSettingsPage />} />
+                <Route path="settings/org" element={<OrgSettingsPage />} />
+                <Route path="settings/team" element={<TeamSettingsPage />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>
     </ColorModeContext.Provider>

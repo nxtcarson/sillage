@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import PageHeader from '../../components/ui/PageHeader';
 
@@ -13,27 +13,35 @@ export default function ContactsPage() {
             variant="contained"
             component={Link}
             to="/app/contacts/new"
-            sx={{ bgcolor: 'primary.main', textTransform: 'none', borderRadius: 2, fontWeight: 600 }}
+            sx={{ bgcolor: 'primary.main', borderRadius: 0, fontWeight: 600 }}
           >
             Add contact
           </Button>
         }
       />
-      <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
+      <Box
+        sx={{
+          border: '1px solid',
+          borderColor: 'divider',
+          borderLeft: '1px solid rgba(189,86,42,0.25)',
+          borderRadius: 0,
+          overflow: 'hidden',
+        }}
+      >
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow sx={{ bgcolor: 'action.hover' }}>
-                <TableCell sx={{ fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary' }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary' }}>Email</TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary' }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary' }}>Agent</TableCell>
+              <TableRow sx={{ bgcolor: 'rgba(255,255,255,0.02)' }}>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Agent</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
                 <TableCell colSpan={4}>
-                  <Box sx={{ py: 4, textAlign: 'center', color: 'text.disabled' }}>
+                  <Box sx={{ py: 5, textAlign: 'center', color: 'text.disabled' }}>
                     <Typography variant="body2">No contacts yet</Typography>
                   </Box>
                 </TableCell>
@@ -41,7 +49,7 @@ export default function ContactsPage() {
             </TableBody>
           </Table>
         </TableContainer>
-      </Paper>
+      </Box>
     </Box>
   );
 }

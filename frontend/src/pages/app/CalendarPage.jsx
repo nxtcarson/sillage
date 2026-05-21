@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import PageHeader from '../../components/ui/PageHeader';
 
 export default function CalendarPage() {
@@ -10,18 +10,30 @@ export default function CalendarPage() {
         action={
           <Button
             variant="contained"
-            sx={{ bgcolor: 'primary.main', textTransform: 'none', borderRadius: 2, fontWeight: 600 }}
+            sx={{ bgcolor: 'primary.main', borderRadius: 0, fontWeight: 600 }}
           >
             Add event
           </Button>
         }
       />
-      <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, minHeight: 520 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 460, color: 'text.disabled', flexDirection: 'column', gap: 1 }}>
+      <Box
+        sx={{
+          border: '1px solid',
+          borderColor: 'divider',
+          borderLeft: '1px solid rgba(189,86,42,0.25)',
+          borderRadius: 0,
+          p: 3,
+          minHeight: 520,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Box sx={{ textAlign: 'center', color: 'text.disabled' }}>
           <Typography variant="body1" fontWeight={500}>Calendar view coming soon</Typography>
-          <Typography variant="body2">Events and renewals will appear here</Typography>
+          <Typography variant="body2" sx={{ mt: 0.5 }}>Events and renewals will appear here</Typography>
         </Box>
-      </Paper>
+      </Box>
     </Box>
   );
 }
