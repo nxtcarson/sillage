@@ -44,14 +44,21 @@ class PolicySerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    related_contact_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Task
         fields = [
             "id", "organization", "assigned_to", "related_contact",
-            "title", "description", "due_date", "priority", "completed",
-            "created_at", "updated_at",
+            "related_contact_name", "title", "description", "due_date",
+            "priority", "completed", "created_at", "updated_at",
         ]
-        read_only_fields = ["id", "organization", "created_at", "updated_at"]
+        read_only_fields = ["id", "organization", "related_contact_name", "created_at", "updated_at"]
+
+    def get_related_contact_name(self, obj):
+        if obj.related_contact:
+            return obj.related_contact.full_name
+        return None
 
 
 class ActivitySerializer(serializers.ModelSerializer):
@@ -79,6 +86,7 @@ class AutomationSerializer(serializers.ModelSerializer):
         model = Automation
         fields = [
             "id", "organization", "name", "trigger_type", "trigger_stage",
-            "action_type", "action_title", "action_due_days", "is_active", "created_at",
+            "action_type", "action_title", "action_due_days", "is_active",
+            "last_run", "created_at",
         ]
-        read_only_fields = ["id", "organization", "created_at"]
+        read_only_fields = ["id", "organization", "last_run", "created_at"]

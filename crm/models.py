@@ -171,9 +171,14 @@ class Document(models.Model):
 class Automation(models.Model):
     TRIGGER_CHOICES = [
         ("lead_stage_change", "Lead moves to stage"),
+        ("policy_expiring_30", "Policy expires in 30 days"),
+        ("lead_inactive_7", "Lead inactive for 7 days"),
+        ("new_contact", "New contact added"),
     ]
     ACTION_CHOICES = [
         ("create_task", "Create a task"),
+        ("send_reminder", "Send reminder"),
+        ("update_status", "Update status"),
     ]
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="automations")
     name = models.CharField(max_length=255)
@@ -184,10 +189,12 @@ class Automation(models.Model):
     action_type = models.CharField(max_length=50, choices=ACTION_CHOICES, default="create_task")
     action_title = models.CharField(
         max_length=255,
+        blank=True,
         help_text="Task title. Use {contact} and {stage} as placeholders.",
     )
     action_due_days = models.IntegerField(default=1)
     is_active = models.BooleanField(default=True)
+    last_run = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -5,7 +5,7 @@ import api from '../../api/axios';
 
 function StatCard({ label, value, accent, loading }) {
   return (
-    <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
+    <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 0, borderLeft: '3px solid rgba(189,86,42,0.35)' }}>
       <Typography variant="body2" color="text.secondary" gutterBottom>
         {label}
       </Typography>
@@ -20,9 +20,36 @@ function StatCard({ label, value, accent, loading }) {
   );
 }
 
+function PipelineBar({ stage, count, max }) {
+  const pct = max > 0 ? (count / max) * 100 : 0;
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ width: 100, flexShrink: 0, textAlign: 'right' }}>
+        {stage}
+      </Typography>
+      <Box sx={{ flex: 1, height: 18, bgcolor: 'rgba(255,255,255,0.04)', borderRadius: 0, overflow: 'hidden' }}>
+        <Box
+          sx={{
+            height: '100%',
+            width: `${pct}%`,
+            bgcolor: '#BD562A',
+            minWidth: count > 0 ? 4 : 0,
+            transition: 'width 0.4s ease',
+          }}
+        />
+      </Box>
+      <Typography variant="body2" fontWeight={600} sx={{ width: 24, textAlign: 'right', color: '#BD562A' }}>
+        {count}
+      </Typography>
+    </Box>
+  );
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState({ contacts: null, leads: null, policies: null, tasks: null });
+  const [pipelineData, setPipelineData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pipelineLoading, setPipelineLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
@@ -52,8 +79,49 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
+
+    async function fetchPipeline() {
+      try {
+        const [stagesRes, leadsRes] = await Promise.allSettled([
+          api.get('/crm/pipeline-stages/'),
+          api.get('/crm/leads/'),
+        ]);
+
+        const stages = stagesRes.status === 'fulfilled'
+          ? (Array.isArray(stagesRes.value.data) ? stagesRes.value.data : stagesRes.value.data.results ?? [])
+          : [];
+
+        const leads = leadsRes.status === 'fulfilled'
+          ? (Array.isArray(leadsRes.value.data) ? leadsRes.value.data : leadsRes.value.data.results ?? [])
+          : [];
+
+        if (stages.length > 0) {
+          const byStage = stages.map((s) => ({
+            name: s.name,
+            count: leads.filter((l) => l.stage === s.id).length,
+          }));
+          setPipelineData(byStage);
+        } else {
+          const FALLBACK = ['New Lead', 'Contacted', 'Quoted', 'Negotiation', 'Won', 'Lost'];
+          const byStage = FALLBACK.map((name) => ({
+            name,
+            count: leads.filter((l) => {
+              const stageName = typeof l.stage === 'string' ? l.stage : '';
+              return stageName.toLowerCase() === name.toLowerCase();
+            }).length,
+          }));
+          setPipelineData(byStage);
+        }
+      } finally {
+        setPipelineLoading(false);
+      }
+    }
+
     fetchStats();
+    fetchPipeline();
   }, []);
+
+  const maxCount = pipelineData.length > 0 ? Math.max(...pipelineData.map((d) => d.count), 1) : 1;
 
   return (
     <Box>
@@ -74,17 +142,29 @@ export default function DashboardPage() {
       </Grid>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
-          <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, minHeight: 280 }}>
+          <Paper variant="outlined" sx={{ p: 3, borderRadius: 0, minHeight: 280 }}>
             <Typography variant="subtitle1" fontWeight={600} gutterBottom>
               Pipeline overview
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200, color: 'text.disabled' }}>
-              <Typography variant="body2">Pipeline chart coming soon</Typography>
-            </Box>
+            {pipelineLoading ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200 }}>
+                <CircularProgress size={28} sx={{ color: 'primary.main' }} />
+              </Box>
+            ) : pipelineData.every((d) => d.count === 0) ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200, color: 'text.disabled' }}>
+                <Typography variant="body2">No lead data yet</Typography>
+              </Box>
+            ) : (
+              <Box sx={{ mt: 2 }}>
+                {pipelineData.map((d) => (
+                  <PipelineBar key={d.name} stage={d.name} count={d.count} max={maxCount} />
+                ))}
+              </Box>
+            )}
           </Paper>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, minHeight: 280 }}>
+          <Paper variant="outlined" sx={{ p: 3, borderRadius: 0, minHeight: 280 }}>
             <Typography variant="subtitle1" fontWeight={600} gutterBottom>
               Upcoming renewals
             </Typography>

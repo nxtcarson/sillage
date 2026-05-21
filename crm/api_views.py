@@ -1,4 +1,7 @@
+from django.utils import timezone
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from core.api_auth import SillageSessionAuthentication, IsAuthenticatedUser, OrgScopedMixin
@@ -134,3 +137,17 @@ class AutomationViewSet(OrgScopedMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(organization=self.get_org())
+
+    @action(detail=True, methods=["post"], url_path="toggle")
+    def toggle(self, request, pk=None):
+        automation = self.get_object()
+        automation.is_active = not automation.is_active
+        automation.save(update_fields=["is_active"])
+        return Response(AutomationSerializer(automation).data)
+
+    @action(detail=True, methods=["post"], url_path="run")
+    def run(self, request, pk=None):
+        automation = self.get_object()
+        automation.last_run = timezone.now()
+        automation.save(update_fields=["last_run"])
+        return Response({"status": "ok", "last_run": automation.last_run})
