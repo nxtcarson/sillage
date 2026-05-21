@@ -16,3 +16,4 @@ dist/
 build/
 firebase-service-account.json
 media/
+.cursor/
